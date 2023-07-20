@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { getRandomTimeout, sleep, listingExists } = require('./helpers');
+const { getRandomTimeout, sleep, getExistingUrls } = require('./helpers');
 const andeleScraper = require('./sites/andeleScraper');
 const ssScraper = require('./sites/ssScraper');
 
@@ -9,9 +9,11 @@ class Scraper {
             headless: "new",
         });
 
+        const existingUrls = await getExistingUrls();
         const page = await browser.newPage();
 
         for (const link of config) {
+
             if (link.includes('andelemandele.lv')) {
                 await page.goto(link);
 
@@ -28,25 +30,24 @@ class Scraper {
                     }
 
                     await page.goto(pageURL);
-
                     await page.waitForSelector('.products .product-card__link');
-
                     const links = await page.$$eval('.products .product-card__link', elements => elements.map(el => el.href));
                     allLinks.push(...links);
-
                     await sleep(delay);
                 }
 
-                for (const url of allLinks) {
-                    const exists = await listingExists(url);
-                    if (exists) {
-                        console.log(`${url} : ALREADY EXISTS`);
-                        continue;
-                    }
-                    const delay = getRandomTimeout(1, 2);
 
+                let existingUrlsSet = new Set(existingUrls);
+                let newLinks = allLinks.filter(url => !existingUrlsSet.has(url));
+                if(newLinks.length > 0) {
+                    console.log(`${newLinks.length} new listings. Scraping...`)
+                } else {
+                    console.log('No new listings');
+                }
+
+                for (const url of newLinks) {
+                    const delay = getRandomTimeout(5, 10);
                     await andeleScraper(url);
-
                     await sleep(delay);
                 }
             }
@@ -70,27 +71,23 @@ class Scraper {
                     }
 
                     await page.goto(pageURL);
-
                     await page.waitForSelector('.top_head');
-
                     const links = await page.$$eval('.d1 .am', elements => elements.map(el => el.href));
-
                     allLinks.push(...links);
-
                     await sleep(delay);
                 }
 
-                for (const url of allLinks) {
-                    const exists = await listingExists(url);
-                    if (exists) {
-                        console.log(`${url} : ALREADY EXISTS`);
-                        continue;
-                    }
-
-                    const delay = getRandomTimeout(1, 2);
-
+                let existingUrlsSet = new Set(existingUrls);
+                let newLinks = allLinks.filter(url => !existingUrlsSet.has(url));
+                if(newLinks.length > 0) {
+                    console.log(`${newLinks.length} new listings. Scraping...`)
+                } else {
+                    console.log('No new listings');
+                }
+                
+                for (const url of newLinks) {
+                    const delay = getRandomTimeout(5, 10);
                     await ssScraper(url);
-
                     await sleep(delay);
                 }
             }

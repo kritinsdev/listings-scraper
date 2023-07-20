@@ -75,27 +75,20 @@ const modelIds = {
 };
 
 
-async function listingExists(url) {
-    const apiUrl = process.env.API_URL;
+async function getExistingUrls() {
+    const apiUrl = `${process.env.API_URL}/urls`;
     try {
-        const response = await axios.get(apiUrl, { params: { url } });
-        if (response.data[0]?.id) {
-            return true;
-        }
+        const response = await axios.get(apiUrl);
+        return response.data.map(listing => listing.url);
     } catch (error) {
-        if (error.response && error.response.status === 404) {
-            return false;
-        }
-
-        // If another status code is returned, log the error
-        console.error('Error while checking if listing exists:', error);
+        console.error('Error while getting existing URLs:', error);
     }
 }
 
 module.exports = {
     sleep,
     getRandomTimeout,
-    listingExists,
+    getExistingUrls,
     models,
     modelIds
 }

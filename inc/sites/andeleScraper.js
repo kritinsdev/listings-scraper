@@ -145,7 +145,7 @@ async function andeleScraper(url) {
 
     if (!listingData.skip) {
         try {
-            await saveListing(listingData);
+            // await saveListing(listingData);
         } catch (error) {
             console.error('Error while saving data to DB', error);
         }
