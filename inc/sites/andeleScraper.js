@@ -5,7 +5,7 @@ const { models, modelIds } = require('../helpers')
 async function andeleScraper(url) {
 
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: "new",
     });
 
     const page = await browser.newPage();
