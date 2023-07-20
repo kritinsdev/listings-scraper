@@ -3,6 +3,7 @@ const Scraper = require('./inc/Scraper');
 const config = require('./siteConfig');
 
 cron.schedule('0 */2 * * *', () => {
+    console.log('Cron job started at', new Date().toLocaleString());
     startScrape();
 });
 
