@@ -75,11 +75,15 @@ const modelIds = {
 };
 
 
-async function getExistingUrls() {
+async function getExistingUrls(withId = false) {
     const apiUrl = `${process.env.API_URL}/urls`;
     try {
         const response = await axios.get(apiUrl);
-        return response.data.map(listing => listing.url);
+        if(!withId) {
+            return response.data.map(listing => listing.url);
+        }
+
+        return response.data;
     } catch (error) {
         console.error('Error while getting existing URLs:', error);
     }

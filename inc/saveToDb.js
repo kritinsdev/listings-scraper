@@ -5,7 +5,9 @@ async function saveListing(listingData) {
   const apiUrl = `${process.env.API_URL}/listings`;
   try {
     const response = await axios.post(apiUrl, listingData);
-    console.log('SAVED: ', response.data.url);
+    if(response.data.url) {
+      console.log('SAVED: ', response.data.url);
+    }
   } catch (error) {
     console.log('=========== ERROR ===========');
     console.error(error.response.data);
