@@ -43,6 +43,11 @@ const unsortedModels = [
 ];
 const models = unsortedModels.sort((a, b) => b.length - a.length);
 
+const categoryIds = {
+    'phone': 1,
+    'gameConsole': 2
+}
+
 const modelIds = {
     '6': 1,
     '6 plus': 2,
@@ -72,6 +77,15 @@ const modelIds = {
     '14 plus': 26,
     '14 pro': 27,
     '14 pro max': 28,
+    'playstation 3': 29,
+    'playstation 4': 30,
+    'playstation 5': 31,
+    'nintendo switch': 32,
+    'steam deck': 33,
+    'xbox 360': 34,
+    'xbox one': 35,
+    'xbox series s': 36,
+    'xbox series x': 37,
 };
 
 
