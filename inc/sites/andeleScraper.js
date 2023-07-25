@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { saveListing } = require('../saveToDb');
+const { saveListing } = require('../saveListing');
 const { models, modelIds } = require('../helpers')
 
 async function andeleScraper(url) {

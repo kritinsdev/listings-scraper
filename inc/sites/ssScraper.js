@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { saveListing } = require('../saveToDb');
+const { saveListing } = require('../saveListing');
 const { modelIds } = require('../helpers')
 
 async function ssScraper(url) {
@@ -38,7 +38,7 @@ async function ssScraper(url) {
         }
 
         const listingObject = {};
-        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'prece', 'preci', 'čeks']
+        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'prece', 'preci', 'čeks', 'гарантия']
 
         // Price
         let price = document.querySelector('.ads_price').textContent;

@@ -11,11 +11,10 @@ async function rescrape() {
     const existingUrls = await getExistingUrls(true);
 
     for (let i = 0; i < existingUrls.length; i++) {
-        const delay = getRandomTimeout(1, 3);
+        const delay = getRandomTimeout(1,2);
         const id = existingUrls[i].id;
 
         if (existingUrls[i].url.includes('andelemandele.lv')) {
-            continue;
             await page.goto(existingUrls[i].url);
 
             const listing = await page.evaluate((id) => {
@@ -90,7 +89,6 @@ async function rescrape() {
                 }
             }
         }
-
         await sleep(delay);
     }
 
