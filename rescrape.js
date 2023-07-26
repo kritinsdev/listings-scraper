@@ -10,14 +10,6 @@ async function rescrape() {
 
     const existingUrls = await getExistingUrls();
 
-    console.log(existingUrls);
-    // const existingUrls = [
-    //     {
-    //         url: 'https://www.andelemandele.lv/perle/8744636/apple-iphone-xr-128gb/',
-    //         id:841
-    //     }
-    // ];
-
     for (let i = 0; i < existingUrls.length; i++) {
         const delay = getRandomTimeout(1,2);
         const id = existingUrls[i].id;
@@ -65,39 +57,6 @@ async function rescrape() {
             }
         }
 
-        // if (existingUrls[i].url.includes('ss.lv')) {
-        //     await page.goto(existingUrls[i].url);
-
-        //     const listing = await page.evaluate((id) => {
-        //         const data = {};
-        //         data.id = id;
-        //         data.active = 1;
-
-        //         // Price
-        //         let price = (document.querySelector('.ads_price')) ? document.querySelector('.ads_price').textContent : null;
-
-        //         if (price) {
-        //             price = price.replace(/\D/g, '');
-        //             price = parseFloat(price);
-        //             data.price = price;
-        //         }
-
-        //         if (!price) {
-        //             data.active = 0;
-        //         }
-
-        //         return data;
-
-        //     }, id);
-
-        //     if (listing) {
-        //         try {
-        //             await updateListing(listing);
-        //         } catch (error) {
-        //             console.error('Error while saving data to DB', error);
-        //         }
-        //     }
-        // }
         await sleep(delay);
     }
 

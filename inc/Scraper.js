@@ -8,6 +8,7 @@ class Scraper {
         this.currentSite = this.siteConfig.sitename;
         this.firstPage = (this.siteConfig.categories) ? this.siteConfig.categories['phone'] : null;
         this.scrapeOnlyFirstPage = this.siteConfig['scrapeOnlyFirst'];
+        this.existingListingsFullUrls = null;
         this.existingListingUrls = [];
 
         console.log(`Starting scraping on: ${this.currentSite}`);
@@ -92,6 +93,10 @@ class Scraper {
             default:
                 break;
         }
+    }
+
+    async rescrapeUrls() {
+        
     }
 }
 
