@@ -91,10 +91,6 @@ class Scraper {
                     await sleep(delay);
                 }
             }
-
-            if (link.includes('facebook.com')) {
-                await page.goto(link);
-            }
         };
 
         await browser.close();
