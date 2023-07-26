@@ -1,10 +1,14 @@
 const puppeteer = require('puppeteer');
 const { getRandomTimeout, sleep, getExistingUrls } = require('./helpers');
-const andeleScraper = require('./sites/andeleScraper');
-const ssScraper = require('./sites/ssScraper');
 
 class Scraper {
-    async scrape(config) {
+    constructor(config) {
+      this.siteConfig = config;
+      
+      console.log(this.siteConfig);
+    }
+
+    async scrape() {
         const browser = await puppeteer.launch({
             headless: "new",
         });
@@ -50,50 +54,6 @@ class Scraper {
                     await andeleScraper(url);
                     await sleep(delay);
                 }
-            }
-
-            if (link.includes('ss.lv')) {
-                await page.goto(link);
-
-                await page.waitForSelector('.td2', { visible: true });
-                const lastPageLink = await page.$eval('div.td2 > a:nth-child(1)', el => el.getAttribute('href'));
-                const regex = /(\d+)\.html$/;
-                const match = lastPageLink.match(regex);
-                let totalPages = match ? parseInt(match[1]) : null;
-                totalPages = 1;
-                let allLinks = [];
-
-                for (let i = 1; i <= totalPages; i++) {
-                    const delay = getRandomTimeout(1, 2);
-                    let pageURL = `https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/page${i}.html`;
-                    if (i === 1) {
-                        pageURL = `https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/`;
-                    }
-
-                    await page.goto(pageURL);
-                    await page.waitForSelector('.top_head');
-                    const links = await page.$$eval('.d1 .am', elements => elements.map(el => el.href));
-                    allLinks.push(...links);
-                    await sleep(delay);
-                }
-
-                let existingUrlsSet = new Set(existingUrls);
-                let newLinks = allLinks.filter(url => !existingUrlsSet.has(url));
-                if(newLinks.length > 0) {
-                    console.log(`${newLinks.length} new listings. Scraping...`)
-                } else {
-                    console.log('No new listings');
-                }
-                
-                for (const url of newLinks) {
-                    const delay = getRandomTimeout(5, 10);
-                    await ssScraper(url);
-                    await sleep(delay);
-                }
-            }
-
-            if (link.includes('facebook.com')) {
-                await page.goto(link);
             }
         };
 
