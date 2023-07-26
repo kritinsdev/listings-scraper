@@ -9,7 +9,8 @@ const {sitesConfig, sites} = require('./siteConfig');
 
 async function startScrape() {
     for(let i = 0; i < sites.length; i++) {
-        new Scraper(sitesConfig[sites[i]]);
+        const SCRAPER = new Scraper(sitesConfig[sites[i]]);
+        await SCRAPER.scrape();
     }
 }
 

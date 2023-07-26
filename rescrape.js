@@ -8,7 +8,7 @@ async function rescrape() {
     });
     const page = await browser.newPage();
 
-    const existingUrls = await getExistingUrls(true);
+    const existingUrls = await getExistingUrls();
 
     for (let i = 0; i < existingUrls.length; i++) {
         const delay = getRandomTimeout(1,2);

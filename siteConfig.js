@@ -2,7 +2,7 @@ const { getExistingUrls } = require('./inc/helpers');
 const andeleScraper = require('./inc/sites/andeleScraper');
 const ssScraper = require('./inc/sites/ssScraper');
 
-export const sites = ['andelemandele', 'ss'];
+const sites = ['andelemandele', 'ss'];
 
 const sitesConfig = {
     andelemandele: {
@@ -10,17 +10,28 @@ const sitesConfig = {
         selectors: {
             paginator: '.paginator',
         },
+
         categories: {
             phone: 'https://www.andelemandele.lv/perles/elektronika/telefoni/#order:created/brand:3232',
             gameConsole: ''
         },
-        existingLinks: getExistingUrls('andelemandele'),
+        scrapeOnlyFirst: true,
+        listingsUrls: getUrls('andelemandele'),
         scraper: andeleScraper,
     },
 
     ss: {
         sitename: 'ss',
-        existingLinks: getExistingUrls('ss'),
+        selectors: {
+            paginator: '.td2',
+        },
+
+        categories: {
+            phone: 'https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/',
+            gameConsole: ''
+        },
+        scrapeOnlyFirst: true,
+        listingsUrls: getUrls('ss'),
         scraper: ssScraper,
     }
 };
@@ -29,4 +40,4 @@ async function getUrls(site) {
     return await getExistingUrls(site);
 }
 
-module.exports = sitesConfig;
+module.exports = {sites, sitesConfig};

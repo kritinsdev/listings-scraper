@@ -30,13 +30,6 @@ async function ssScraper(url) {
             return date;
         }
 
-        function findBatteryCapacity(string) {
-            const ft = string.toLowerCase();
-            const regex = new RegExp('(\\d+)\\s*%', 'i');
-            const hasMatch = ft.match(regex);
-            return hasMatch ? parseInt(hasMatch[1]) : null;
-        }
-
         const listingObject = {};
         const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'prece', 'preci', 'čeks', 'гарантия']
 
@@ -55,30 +48,26 @@ async function ssScraper(url) {
         model = model.toLowerCase();
         model = model.replace(/apple iphone /gi, "");
 
-        //Memory
-        let memory = document.querySelector('#tdo_42').textContent;
-        memory = parseInt(memory);
-
-        //Battery capacity
-        let batteryCapacity = findBatteryCapacity(description);
-
         //Date added 
         let added = document.querySelector('#page_main > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td:nth-child(2)').textContent.trim();
         added = parseDateString(added);
         
         listingObject.url = url;
         listingObject.price = price;
-        listingObject.model_id = modelIds[model]
-        listingObject.memory = memory;
-
-        if (batteryCapacity && !isNaN(batteryCapacity)) {
-            listingObject.battery_capacity = parseInt(batteryCapacity);
-        }
+        listingObject.model_id = modelIds[model];
+        listingObject.category_id = 1;
+        listingObject.site = 'ss';
 
         listingObject.added = new Date(added.getTime() - added.getTimezoneOffset() * 60000).toISOString();
 
-        if (listingObject.price < 50 || isBlacklisted) {
+        if(listingObject.price < 50) {
             listingObject.skip = true;
+            listingObject.skipReason = `SKIPPING: Price is less than 50 euros / URL: ${url}`;
+        }
+
+        if(isBlacklisted) {
+            listingObject.skip = true;
+            listingObject.skipReason = `SKIPPING: Contains blacklisted word / URL: ${url}`;
         }
 
         return listingObject;
@@ -92,7 +81,7 @@ async function ssScraper(url) {
             console.error('Error while saving data to DB', error);
         }
     } else {
-        console.log('SKIPPING: ' + listingData.url);
+        console.error(listingData.skipReason);
     }
 
     await browser.close();
