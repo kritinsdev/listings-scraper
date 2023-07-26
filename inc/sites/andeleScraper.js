@@ -62,20 +62,6 @@ async function andeleScraper(url) {
             return match ? match[0] : null;
         }
 
-        function findMemory(string) {
-            const ft = string.toLowerCase();
-            const regex = new RegExp('(\\d+)\\s*gb\\b', 'i');
-            const hasMatch = ft.match(regex);
-            return hasMatch ? parseInt(hasMatch[1]) : null;
-        }
-
-        function findBatteryCapacity(string) {
-            const ft = string.toLowerCase();
-            const regex = new RegExp('(\\d+)\\s*%', 'i');
-            const hasMatch = ft.match(regex);
-            return hasMatch ? parseInt(hasMatch[1]) : null;
-        }
-
         const unavailable = document.querySelector('.block-404__logo');
         if(unavailable) {
             return false;
@@ -106,23 +92,11 @@ async function andeleScraper(url) {
         //Model 
         let phoneModel = findModel(title) ? findModel(title) : findModel(formattedDescription);
 
-        //Capacity
-        let memory = findMemory(title) ? findMemory(title) : findMemory(formattedDescription);
-
-        //Battery capacity
-        let batteryCapacity = findBatteryCapacity(formattedDescription);
-
         listingObject.url = url;
         listingObject.price = parseFloat(formattedPrice);
         listingObject.model_id = modelIds[phoneModel];
-        
-        if(memory && !isNaN(memory)) {
-            listingObject.memory = parseInt(memory);
-        }
-
-        if (batteryCapacity && !isNaN(batteryCapacity)) {
-            listingObject.battery_capacity = parseInt(batteryCapacity);
-        }
+        listingObject.category_id = 1;
+        listingObject.site = 'andelemandele';
 
         const dataRows = document.querySelectorAll('.attribute-list > tbody > tr');
         for (let i = 0; i < dataRows.length; i++) {
@@ -135,8 +109,14 @@ async function andeleScraper(url) {
             }
         }
 
-        if(!phoneModel || !listingObject.model_id || listingObject.price < 50) {
+        if(!phoneModel || !listingObject.model_id) {
             listingObject.skip = true;
+            listingObject.skipReason = `SKIPPING: Could not find phone model / URL: ${url}`;
+        }
+
+        if(listingObject.price < 50) {
+            listingObject.skip = true;
+            listingObject.skipReason = `SKIPPING: Price is less than 50 euros / URL: ${url}`;
         }
 
         return listingObject;
@@ -150,7 +130,7 @@ async function andeleScraper(url) {
             console.error('Error while saving data to DB', error);
         }
     } else {
-        console.log('SKIPPING: ' + listingData.url);
+        console.error(listingData.skipReason);
     }
 
     await browser.close();

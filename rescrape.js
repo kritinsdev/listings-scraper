@@ -8,9 +8,7 @@ async function rescrape() {
     });
     const page = await browser.newPage();
 
-    // loop over all sites 
-    // getExistingUrls - pass site as argument, get only site links. 
-    const existingUrls = await getExistingUrls(true);
+    const existingUrls = await getExistingUrls();
 
     console.log(existingUrls);
     // const existingUrls = [

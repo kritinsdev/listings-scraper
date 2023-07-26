@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const Scraper = require('./inc/Scraper');
-const config = require('./siteConfig');
+const {sitesConfig, sites} = require('./siteConfig');
 
 cron.schedule('*/3 * * * *', () => {
     console.log('Cron job started at', new Date().toLocaleString());
@@ -8,6 +8,10 @@ cron.schedule('*/3 * * * *', () => {
 });
 
 async function startScrape() {
-    const scraper = new Scraper();
-    await scraper.scrape(config);
+    for(let i = 0; i < sites.length; i++) {
+        const SCRAPER = new Scraper(sitesConfig[sites[i]]);
+        await SCRAPER.scrape();
+    }
 }
+
+startScrape();
