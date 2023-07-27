@@ -32,7 +32,7 @@ class Scraper {
 
         await this.collectUrls(page, await this.getTotalPages(page));
 
-        let existingUrlsSet = new Set(this.existingListingUrls);
+        let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
         let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
         if (newLinks.length > 0) {
             console.log(`${newLinks.length} new listings. Scraping...`)
