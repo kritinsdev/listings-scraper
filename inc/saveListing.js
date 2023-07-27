@@ -4,8 +4,12 @@ require('dotenv').config()
 async function saveListing(listingData) {
   const apiUrl = `${process.env.API_URL}/listings`;
   try {
-    const response = await axios.post(apiUrl, listingData);
-    if(response.data.url) {
+    const response = await axios.post(apiUrl, listingData, {
+      headers: {
+        'Authorization': `Bearer ${process.env.BEARER_TOKEN}`
+      }
+    });
+    if (response.data.url) {
       console.log('SAVED: ', response.data.url);
     }
   } catch (error) {

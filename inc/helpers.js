@@ -80,11 +80,19 @@ async function getExistingUrls(site = null) {
     try {
         if (site) {
             const params = { site: site };
-            const response = await axios.get(apiUrl, { params });
+            const response = await axios.get(apiUrl, { params }, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.BEARER_TOKEN}` 
+                }
+            });
             return response.data;
         }
 
-        const response = await axios.get(apiUrl);
+        const response = await axios.get(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${process.env.BEARER_TOKEN}
+            }
+        });
         return response.data;
         
     } catch (error) {

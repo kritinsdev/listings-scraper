@@ -1,6 +1,8 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { saveListing } = require('../saveListing');
-const { modelIds } = require('../helpers')
+const { modelIds } = require('../helpers');
+puppeteer.use(StealthPlugin());
 
 async function ssScraper(url) {
 
@@ -63,6 +65,11 @@ async function ssScraper(url) {
         if(listingObject.price < 50) {
             listingObject.skip = true;
             listingObject.skipReason = `SKIPPING: Price is less than 50 euros / URL: ${url}`;
+        }
+
+        if(!listingObject.model_id) {
+            listingObject.skip = true;
+            listingObject.skipReason = `SKIPPING: Could not find model / URL: ${url}`;
         }
 
         if(isBlacklisted) {

@@ -1,6 +1,8 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { saveListing } = require('../saveListing');
 const { models, modelIds } = require('../helpers')
+puppeteer.use(StealthPlugin());
 
 async function andeleScraper(url) {
 
