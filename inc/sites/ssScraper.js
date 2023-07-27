@@ -33,7 +33,7 @@ async function ssScraper(url) {
         }
 
         const listingObject = {};
-        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'prece', 'preci', 'čeks', 'гарантия']
+        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'гарантия']
 
         // Price
         let price = document.querySelector('.ads_price').textContent;
@@ -64,17 +64,17 @@ async function ssScraper(url) {
 
         if(listingObject.price < 50) {
             listingObject.skip = true;
-            listingObject.skipReason = `SKIPPING: Price is less than 50 euros / URL: ${url}`;
+            listingObject.skipReason = `Price is less than 50 euros / URL: ${url}`;
         }
 
         if(!listingObject.model_id) {
             listingObject.skip = true;
-            listingObject.skipReason = `SKIPPING: Could not find model / URL: ${url}`;
+            listingObject.skipReason = `Could not find model / URL: ${url}`;
         }
 
         if(isBlacklisted) {
             listingObject.skip = true;
-            listingObject.skipReason = `SKIPPING: Contains blacklisted word / URL: ${url}`;
+            listingObject.skipReason = `Contains blacklisted word / URL: ${url}`;
         }
 
         return listingObject;

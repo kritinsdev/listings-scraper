@@ -75,51 +75,35 @@ const modelIds = {
 };
 
 
-async function getExistingUrls(site = null) {
+async function getExistingUrls(site) {
     const apiUrl = `${process.env.API_URL}/urls`;
     try {
-        if (site) {
-            const params = { site: site };
-            const response = await axios.get(apiUrl, { params }, {
-                headers: {
-                    'Authorization': `Bearer ${process.env.BEARER_TOKEN}` 
-                }
-            });
-            return response.data;
-        }
-
+        const params = { site: site };
         const response = await axios.get(apiUrl, {
+            params: params,
             headers: {
-                'Authorization': `Bearer ${process.env.BEARER_TOKEN}`
+                'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
+                'Content-Type': 'application/json',
             }
         });
         return response.data;
-        
     } catch (error) {
         console.error('Error while getting existing URLs:', error);
     }
 }
 
 async function getBlacklistUrls(site = null) {
-    const apiUrl = `${process.env.API_URL}/urls`;
+    const apiUrl = `${process.env.API_URL}/blacklist`;
     try {
-        if (site) {
-            const params = { site: site };
-            const response = await axios.get(apiUrl, { params }, {
-                headers: {
-                    'Authorization': `Bearer ${process.env.BEARER_TOKEN}` 
-                }
-            });
-            return response.data;
-        }
-
+        const params = { site: site };
         const response = await axios.get(apiUrl, {
+            params: params,
             headers: {
-                'Authorization': `Bearer ${process.env.BEARER_TOKEN}`
+                'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
+                'Content-Type': 'application/json'
             }
         });
         return response.data;
-        
     } catch (error) {
         console.error('Error while getting existing URLs:', error);
     }

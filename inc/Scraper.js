@@ -20,19 +20,21 @@ class Scraper {
         const browser = await puppeteer.launch({
             headless: "new",
         });
-
-        const urlsPlaceholder = await getExistingUrls(this.currentSite);
-        const blacklistUrls = await getBlacklistUrls(this.currentSite);
         
-        this.existingListingUrls = urlsPlaceholder.map(url => url.url);
-
+        let blacklistUrls = await getBlacklistUrls(this.currentSite);
+        blacklistUrls = blacklistUrls.map(obj => obj.url);
+        
+        let existingListingUrls = await getExistingUrls(this.currentSite);
+        this.existingListingUrls = existingListingUrls.map(url => url.url);
+        
         const page = await browser.newPage();
-
+        
         await page.goto(this.firstPage);
-
+        
         await this.collectUrls(page, await this.getTotalPages(page));
-
+        
         let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
+        
         let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
         if (newLinks.length > 0) {
             console.log(`${newLinks.length} new listings. Scraping...`)

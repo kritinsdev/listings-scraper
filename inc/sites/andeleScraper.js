@@ -63,13 +63,17 @@ async function andeleScraper(url) {
             const match = formattedText.match(regex);
             return match ? match[0] : null;
         }
+  
+        const listingObject = {};
+        listingObject.url = url;
+        listingObject.site = 'andelemandele';
 
         const unavailable = document.querySelector('.block-404__logo');
         if(unavailable) {
-            return false;
+            listingObject.skip = true;
+            listingObject.skipReason = '404 listing is sold or removed';
+            return listingObject;
         }
-
-        const listingObject = {};
 
         // Price
         const price = document.querySelector('.product__price');
@@ -94,11 +98,11 @@ async function andeleScraper(url) {
         //Model 
         let phoneModel = findModel(title) ? findModel(title) : findModel(formattedDescription);
 
-        listingObject.url = url;
+
         listingObject.price = parseFloat(formattedPrice);
         listingObject.model_id = modelIds[phoneModel];
         listingObject.category_id = 1;
-        listingObject.site = 'andelemandele';
+
 
         const dataRows = document.querySelectorAll('.attribute-list > tbody > tr');
         for (let i = 0; i < dataRows.length; i++) {
@@ -113,12 +117,12 @@ async function andeleScraper(url) {
 
         if(!phoneModel || !listingObject.model_id) {
             listingObject.skip = true;
-            listingObject.skipReason = `SKIPPING: Could not find phone model / URL: ${url}`;
+            listingObject.skipReason = `Could not find phone model / URL: ${url}`;
         }
 
         if(listingObject.price < 50) {
             listingObject.skip = true;
-            listingObject.skipReason = `SKIPPING: Price is less than 50 euros / URL: ${url}`;
+            listingObject.skipReason = `Price is less than 50 euros / URL: ${url}`;
         }
 
         return listingObject;

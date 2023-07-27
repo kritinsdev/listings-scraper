@@ -6,7 +6,8 @@ async function saveListing(listingData) {
   try {
     const response = await axios.post(apiUrl, listingData, {
       headers: {
-        'Authorization': `Bearer ${process.env.BEARER_TOKEN}`
+        'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
+        'Content-Type': 'application/json'
       }
     });
     if (response.data.url) {
