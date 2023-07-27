@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const { saveListing } = require('../saveListing');
+const { saveListing, saveToBlacklist } = require('../saveListing');
 const { models, modelIds } = require('../helpers')
 puppeteer.use(StealthPlugin());
 
@@ -132,7 +132,8 @@ async function andeleScraper(url) {
             console.error('Error while saving data to DB', error);
         }
     } else {
-        console.error(listingData.skipReason);
+        await saveToBlacklist(listingData);
+        console.log(`Saved to BLACKLIST: ${listingData.skipReason}`);
     }
 
     await browser.close();

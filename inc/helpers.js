@@ -100,10 +100,36 @@ async function getExistingUrls(site = null) {
     }
 }
 
+async function getBlacklistUrls(site = null) {
+    const apiUrl = `${process.env.API_URL}/urls`;
+    try {
+        if (site) {
+            const params = { site: site };
+            const response = await axios.get(apiUrl, { params }, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.BEARER_TOKEN}` 
+                }
+            });
+            return response.data;
+        }
+
+        const response = await axios.get(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${process.env.BEARER_TOKEN}`
+            }
+        });
+        return response.data;
+        
+    } catch (error) {
+        console.error('Error while getting existing URLs:', error);
+    }
+}
+
 module.exports = {
     sleep,
     getRandomTimeout,
     getExistingUrls,
+    getBlacklistUrls,
     models,
     modelIds
 }

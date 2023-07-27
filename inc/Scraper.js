@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const { getRandomTimeout, sleep, getExistingUrls } = require('./helpers');
+const { getRandomTimeout, sleep, getExistingUrls, getBlacklistUrls } = require('./helpers');
 puppeteer.use(StealthPlugin());
 
 class Scraper {
@@ -22,6 +22,8 @@ class Scraper {
         });
 
         const urlsPlaceholder = await getExistingUrls(this.currentSite);
+        const blacklistUrls = await getBlacklistUrls(this.currentSite);
+        
         this.existingListingUrls = urlsPlaceholder.map(url => url.url);
 
         const page = await browser.newPage();

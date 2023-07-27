@@ -19,4 +19,20 @@ async function saveListing(listingData) {
   }
 }
 
-module.exports = { saveListing };
+async function saveToBlacklist(data) {
+  const apiUrl = `${process.env.API_URL}/blacklist`;
+  try {
+    const response = await axios.post(apiUrl, data, {
+      headers: {
+        'Authorization': `Bearer ${process.env.BEARER_TOKEN}`
+      }
+    });
+    if (response.data.url) {
+      console.log('SAVED: ', response.data.url);
+    }
+  } catch (error) {
+    console.error(error.response.data);
+  }
+}
+
+module.exports = { saveListing, saveToBlacklist };
