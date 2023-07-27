@@ -90,7 +90,7 @@ async function getExistingUrls(site = null) {
 
         const response = await axios.get(apiUrl, {
             headers: {
-                'Authorization': `Bearer ${process.env.BEARER_TOKEN}
+                'Authorization': `Bearer ${process.env.BEARER_TOKEN}`
             }
         });
         return response.data;
