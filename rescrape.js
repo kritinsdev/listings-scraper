@@ -8,6 +8,16 @@ async function rescrape() {
     });
     const page = await browser.newPage();
 
+       // Log in before the loop
+    //    await page.goto('https://www.example.com/login');
+    //    await page.type('input#username', 'my_username');
+    //    await page.type('input#password', 'my_password');
+    //    await Promise.all([
+    //      page.waitForNavigation(),
+    //      page.click('button#submit'),
+    //    ]);
+   
+
     const existingUrls = await getExistingUrls();
 
     for (let i = 0; i < existingUrls.length; i++) {
