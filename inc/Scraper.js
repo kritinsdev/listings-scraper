@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { getRandomTimeout, sleep, getExistingUrls, getBlacklistUrls } = require('./helpers');
+const { updateListing } = require('./updateListing');
 puppeteer.use(StealthPlugin());
 
 class Scraper {
@@ -20,21 +21,21 @@ class Scraper {
         const browser = await puppeteer.launch({
             headless: "new",
         });
-        
+
         let blacklistUrls = await getBlacklistUrls(this.currentSite);
         blacklistUrls = blacklistUrls.map(obj => obj.url);
-        
+
         let existingListingUrls = await getExistingUrls(this.currentSite);
         this.existingListingUrls = existingListingUrls.map(url => url.url);
-        
+
         const page = await browser.newPage();
-        
+
         await page.goto(this.firstPage);
-        
+
         await this.collectUrls(page, await this.getTotalPages(page));
-        
+
         let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
-        
+
         let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
         if (newLinks.length > 0) {
             console.log(`${newLinks.length} new listings. Scraping...`)
@@ -103,7 +104,7 @@ class Scraper {
 
     async checkUrlsForUpdates() {
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: "new",
         });
         const page = await browser.newPage();
 
@@ -112,7 +113,6 @@ class Scraper {
         }
 
         const existingUrls = await getExistingUrls(this.currentSite);
-        console.log(existingUrls);
 
         for (let i = 0; i < existingUrls.length; i++) {
             const delay = getRandomTimeout(1, 3);
@@ -120,22 +120,98 @@ class Scraper {
 
             await page.goto(existingUrls[i].url, { waitUntil: 'networkidle0' });
 
-            const listing = await page.evaluate((id) => {
-                    // return this.checkAndeleListing(id);
-                    // const listingData = this.checkSsListing(id)
-                    return this.currentSite;
-            }, id);
+            if (this.currentSite === 'andelemandele') {
+                const listing = await page.evaluate((id) => {
+                    const listing = {};
+                    listing.active = 1;
+                    listing.id = id;
 
-            console.log('listing?');
-            console.log(listing);
+                    //Checks
+                    const unavailable = document.querySelector('.block-404__logo');
+                    let sold = document.querySelector('.alert-info'); // wait for this selector
+                    sold = (sold) ? sold.textContent.trim() : null;
+                    // Price
+                    const price = document.querySelector('.product__price');
+                    const oldPrice = (price) ? price.querySelector('s') : null;
+                    if (oldPrice) {
+                        oldPrice.remove();
+                    }
 
-            if (listing) {
-                try {
-                    console.log(listing);
-                    // await updateListing(listing);
-                    console.log(`--------------`);
-                } catch (error) {
-                    console.error('Error while saving data to DB', error);
+                    const formattedPrice = (price) ? price.textContent.replace(/[^0-9.]+/g, '') : null;
+
+                    if (formattedPrice) {
+                        listing.price = parseFloat(formattedPrice);
+                    }
+
+                    // if(response.status() === 404){
+                    //     listing.active = 0;
+                    //     listing.info = `404: Listing is removed / ID:${listing.id}`;
+                    // }
+
+                    if (unavailable) {
+                        listing.active = 0;
+                        listing.info = `404: Listing is removed / ID:${listing.id}`;
+                    }
+
+                    if (sold && sold.toLowerCase() == 'šī pērle ir nomedīta.') {
+                        listing.active = 0;
+                        listing.info = `${sold} / ID:${listing.id}`;
+                    }
+
+                    return listing;
+                }, id);
+
+                if (listing) {
+                    try {
+                        await updateListing(listing);
+                    } catch (error) {
+                        console.error('Error while saving data to DB', error);
+                    }
+                }
+            }
+
+            if (this.currentSite === 'ss') {
+                const listing = await page.evaluate((id) => {
+                    const listing = {};
+                    listing.id = id;
+                    listing.active = 1;
+
+                    // Price
+                    let price = (document.querySelector('.ads_price')) ? document.querySelector('.ads_price').textContent : null;
+
+                    //Archive
+                    let archive = (document.querySelector('img[src="https://i.ss.lv/img/a_lv.gif"]')) ? true : false;
+
+                    if (price) {
+                        price = price.replace(/\D/g, '');
+                        price = parseFloat(price);
+                        listing.price = price;
+                    }
+
+                    // if(response.status() === 404){
+                    //     listing.active = 0;
+                    //     listing.info = `404: Listing is removed / ID:${listing.id}`;
+                    // }
+
+                    if (!price) {
+                        listing.active = 0;
+                        listing.info = `Listing missing price / ID:${listing.id}`;
+                    }
+
+                    if (archive) {
+                        listing.active = 0;
+                        listing.info = `Listing is in archvie / ID:${listing.id}`;
+                    }
+
+                    return listing;
+                }, id);
+
+                if (listing) {
+                    try {
+                        await updateListing(listing);
+                    } catch (error) {
+                        console.error('Error while saving data to DB', error);
+                    }
                 }
             }
 
@@ -171,82 +247,6 @@ class Scraper {
             page.click('#passwordNext > div > button'),
         ]);
         await sleep(delay);
-    }
-
-    checkAndeleListing(id) {
-        const listing = {};
-        listing.active = 1;
-        listing.id = id;
-
-        //Checks
-        const unavailable = document.querySelector('.block-404__logo');
-        let sold = document.querySelector('.alert-info'); // wait for this selector
-        sold = (sold) ? sold.textContent.trim() : null;
-        // Price
-        const price = document.querySelector('.product__price');
-        const oldPrice = (price) ? price.querySelector('s') : null;
-        if (oldPrice) {
-            oldPrice.remove();
-        }
-
-        const formattedPrice = (price) ? price.textContent.replace(/[^0-9.]+/g, '') : null;
-
-        if (formattedPrice) {
-            listing.price = parseFloat(formattedPrice);
-        }
-
-        // if(response.status() === 404){
-        //     listing.active = 0;
-        //     listing.info = `404: Listing is removed / ID:${listing.id}`;
-        // }
-
-        if (unavailable) {
-            listing.active = 0;
-            listing.info = `404: Listing is removed / ID:${listing.id}`;
-        }
-
-        if (sold && sold.toLowerCase() == 'šī pērle ir nomedīta.') {
-            listing.active = 0;
-            listing.info = `${sold} / ID:${listing.id}`;
-        }
-
-        return listing;
-    }
-
-    checkSsListing(id) {
-        console.log('here?');
-        const listing = {};
-        listing.id = id;
-        listing.active = 1;
-
-        // Price
-        let price = (document.querySelector('.ads_price')) ? document.querySelector('.ads_price').textContent : null;
-
-        //Archive
-        let archive = (document.querySelector('img[src="https://i.ss.lv/img/a_lv.gif"]')) ? true : false;
-
-        if (price) {
-            price = price.replace(/\D/g, '');
-            price = parseFloat(price);
-            listing.price = price;
-        }
-
-        // if(response.status() === 404){
-        //     listing.active = 0;
-        //     listing.info = `404: Listing is removed / ID:${listing.id}`;
-        // }
-
-        if (!price) {
-            listing.active = 0;
-            listing.info = `Listing missing price / ID:${listing.id}`;
-        }
-
-        if(archive) {
-            listing.active = 0;
-            listing.info = `Listing is in archvie / ID:${listing.id}`;
-        }
-
-        return listing;
     }
 }
 

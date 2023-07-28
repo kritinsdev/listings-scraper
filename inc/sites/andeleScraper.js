@@ -96,11 +96,11 @@ async function andeleScraper(url) {
         title = title.textContent.replace(/\t|\n/g, '');
 
         //Model 
-        let phoneModel = findModel(title) ? findModel(title) : findModel(formattedDescription);
+        let listingModel = findModel(title) ? findModel(title) : findModel(formattedDescription);
 
 
         listingObject.price = parseFloat(formattedPrice);
-        listingObject.model_id = modelIds[phoneModel];
+        listingObject.model_id = modelIds[listingModel];
         listingObject.category_id = 1;
 
 
@@ -115,9 +115,9 @@ async function andeleScraper(url) {
             }
         }
 
-        if(!phoneModel || !listingObject.model_id) {
+        if(!listingModel || !listingObject.model_id) {
             listingObject.skip = true;
-            listingObject.skipReason = `Could not find phone model / URL: ${url}`;
+            listingObject.skipReason = `Could not find model / URL: ${url}`;
         }
 
         if(listingObject.price < 50) {
@@ -137,7 +137,6 @@ async function andeleScraper(url) {
         }
     } else {
         await saveToBlacklist(listingData);
-        console.log(`Saved to BLACKLIST: ${listingData.skipReason}`);
     }
 
     await browser.close();

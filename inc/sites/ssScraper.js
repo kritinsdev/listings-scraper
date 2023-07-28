@@ -33,7 +33,7 @@ async function ssScraper(url) {
         }
 
         const listingObject = {};
-        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'гарантия']
+        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'гарантия', 'Pērkam visus', 'pērkam visus']
 
         // Price
         let price = document.querySelector('.ads_price').textContent;

@@ -10,8 +10,14 @@ const sitesConfig = {
             paginator: '.paginator',
         },
         categories: {
-            phone: 'https://www.andelemandele.lv/perles/elektronika/telefoni/#order:created/brand:3232',
-            gameConsole: ''
+            phone: {
+                id:1,
+                url:'https://www.andelemandele.lv/perles/elektronika/telefoni/#order:created/brand:3232',
+            },
+            gameConsole: {
+                id:2,
+                url:''
+            }
         },
         scrapeOnlyFirst: true,
         scraper: andeleScraper,
@@ -23,8 +29,14 @@ const sitesConfig = {
             paginator: '.td2',
         },
         categories: {
-            phone: 'https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/',
-            gameConsole: ''
+            phone: {
+                id:1,
+                url:'https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/',
+            },
+            gameConsole: {
+                id:2,
+                url:''
+            }
         },
         scrapeOnlyFirst: true,
         scraper: ssScraper,

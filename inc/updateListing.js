@@ -7,11 +7,15 @@ async function updateListing(data) {
   try {
     const response = await axios.put(apiUrl, data, {
       headers: {
-        'Authorization': `Bearer ${process.env.BEARER_TOKEN}`
+        'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
+        'Content-Type': 'application/json'
       }
     });
-
-    console.log(`Listing ID ${response.data.id} updated`);
+    if(data.info) {
+      console.log(`Listing with ID:${data.id} updated. ${data.info}`);
+    } else {
+      console.log(`ID: ${data.id}`);
+    }
   } catch (error) {
     console.log('=========== ERROR ===========');
     console.error(error.response.data);

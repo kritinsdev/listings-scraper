@@ -29,7 +29,7 @@ async function saveToBlacklist(data) {
       }
     });
     if (response.data.url) {
-      console.log('SAVED: ', response.data.url);
+      console.log(`Saved to BLACKLIST: ${data.skipReason}`);
     }
   } catch (error) {
     console.error(error.response.data);
