@@ -16,7 +16,7 @@ const sitesConfig = {
             },
             gameConsole: {
                 id:2,
-                url:''
+                url:'https://www.andelemandele.lv/perles/elektronika/videospeles/#order:created'
             }
         },
         scrapeOnlyFirst: true,
@@ -35,7 +35,7 @@ const sitesConfig = {
             },
             gameConsole: {
                 id:2,
-                url:''
+                url:'https://www.ss.lv/lv/electronics/computers/game-consoles/sell/'
             }
         },
         scrapeOnlyFirst: true,

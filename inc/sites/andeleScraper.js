@@ -5,14 +5,20 @@ const { models, modelIds } = require('../helpers')
 puppeteer.use(StealthPlugin());
 
 async function andeleScraper(url) {
-
     const browser = await puppeteer.launch({
         headless: "new",
     });
-
+    
     const page = await browser.newPage();
-
+    
     await page.goto(url);
+    
+    const args = {
+        url: url,
+        models: models,
+        modelIds: modelIds
+        //category id
+    }
 
     const listingData = await page.evaluate((url, models, modelIds) => {
         const monthNames = {

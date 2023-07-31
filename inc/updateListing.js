@@ -12,14 +12,12 @@ async function updateListing(data) {
       }
     });
     if(data.info) {
-      console.log(`Listing with ID:${data.id} updated. ${data.info}`);
+      console.log(`${data.info}`);
     } else {
-      console.log(`ID: ${data.id}`);
+      console.log(`No update. ID: ${data.id}`);
     }
   } catch (error) {
-    console.log('=========== ERROR ===========');
     console.error(error.response.data);
-    console.log('=========== ERROR ===========');
   }
 }
 

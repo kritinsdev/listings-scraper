@@ -89,7 +89,6 @@ async function ssScraper(url) {
         }
     } else {
         await saveToBlacklist(listingData);
-        console.log(`Saved to BLACKLIST: ${listingData.skipReason}`);
     }
 
     await browser.close();

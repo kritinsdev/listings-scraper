@@ -39,7 +39,10 @@ const unsortedModels = [
     '14 plus',
     '14+',
     '14 pro',
-    '14 pro max'
+    '14 pro max',
+    'playstation 3',
+    'playstation 4',
+    'playstation 5',
 ];
 const models = unsortedModels.sort((a, b) => b.length - a.length);
 

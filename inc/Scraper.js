@@ -9,7 +9,7 @@ class Scraper {
         this.siteConfig = config;
         this.scrapedListingUrls = [];
         this.currentSite = this.siteConfig.sitename;
-        this.firstPage = (this.siteConfig.categories) ? this.siteConfig.categories['phone'] : null;
+        this.firstPage = (this.siteConfig.categories.phone) ? this.siteConfig.categories.phone.url : null;
         this.scrapeOnlyFirstPage = this.siteConfig['scrapeOnlyFirst'];
         this.existingListingsFullUrls = null;
         this.existingListingUrls = [];
@@ -26,7 +26,7 @@ class Scraper {
         blacklistUrls = blacklistUrls.map(obj => obj.url);
 
         let existingListingUrls = await getExistingUrls(this.currentSite);
-        this.existingListingUrls = existingListingUrls.map(url => url.url);
+        this.existingListingUrls = existingListingUrls.map(obj => obj.url);
 
         const page = await browser.newPage();
 
@@ -44,12 +44,14 @@ class Scraper {
         }
 
         for (const url of newLinks) {
-            const delay = getRandomTimeout(5, 10);
+            const delay = getRandomTimeout(2,4);
 
             await this.siteConfig.scraper(url);
 
             await sleep(delay);
         }
+
+        console.log('Finished scraping.')
         await browser.close();
     }
 
@@ -112,10 +114,10 @@ class Scraper {
             await this.loginAndele(page);
         }
 
-        const existingUrls = await getExistingUrls(this.currentSite);
+        const existingUrls = await getExistingUrls(this.currentSite, 1);
 
         for (let i = 0; i < existingUrls.length; i++) {
-            const delay = getRandomTimeout(1, 3);
+            const delay = getRandomTimeout(1, 2);
             const id = existingUrls[i].id;
 
             await page.goto(existingUrls[i].url, { waitUntil: 'networkidle0' });
@@ -200,7 +202,7 @@ class Scraper {
 
                     if (archive) {
                         listing.active = 0;
-                        listing.info = `Listing is in archvie / ID:${listing.id}`;
+                        listing.info = `Listing is in archive / ID:${listing.id}`;
                     }
 
                     return listing;
