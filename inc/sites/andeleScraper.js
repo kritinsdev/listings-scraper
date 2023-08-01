@@ -4,11 +4,7 @@ const { saveListing, saveToBlacklist } = require('../saveListing');
 const { models, modelIds } = require('../helpers')
 puppeteer.use(StealthPlugin());
 
-async function andeleScraper(url) {
-    const browser = await puppeteer.launch({
-        headless: "new",
-    });
-    
+async function andeleScraper(url, browser) {
     const page = await browser.newPage();
     
     await page.goto(url);
@@ -21,6 +17,15 @@ async function andeleScraper(url) {
     }
 
     const listingData = await page.evaluate((url, models, modelIds) => {
+        const listingObject = {};
+
+        const unavailable = document.querySelector('.block-404__logo');
+        if(unavailable) {
+            listingObject.skip = true;
+            listingObject.skipReason = '404 listing is sold or removed';
+            return listingObject;
+        }
+
         const monthNames = {
             'janvāris': 0,
             'februāris': 1,
@@ -69,16 +74,12 @@ async function andeleScraper(url) {
             const match = formattedText.match(regex);
             return match ? match[0] : null;
         }
-  
-        const listingObject = {};
-        listingObject.url = url;
-        listingObject.site = 'andelemandele';
 
-        const unavailable = document.querySelector('.block-404__logo');
-        if(unavailable) {
-            listingObject.skip = true;
-            listingObject.skipReason = '404 listing is sold or removed';
-            return listingObject;
+        function findMemory(string) {
+            const ft = string.toLowerCase();
+            const regex = new RegExp('(\\d+)\\s*gb\\b', 'i');
+            const hasMatch = ft.match(regex);
+            return hasMatch ? parseInt(hasMatch[1]) : null;
         }
 
         // Price
@@ -88,11 +89,11 @@ async function andeleScraper(url) {
             oldPrice.remove();
         }
         const formattedPrice = price.textContent.replace(/[^0-9.]+/g, '');
-
+        
         // Description
         const description = document.querySelector('.product__descr').textContent.trim();
-        const formattedDescription = description.replace(/[\n+]/g, ' ');
-
+        const formattedDescription = (description) ? description.replace(/[\n+]/g, ' ') : null;
+        
         // Title
         let title = document.querySelector('.product__title');
         const spanElements = title.querySelectorAll('span');
@@ -100,15 +101,23 @@ async function andeleScraper(url) {
             spanElement.remove();
         });
         title = title.textContent.replace(/\t|\n/g, '');
-
+        
         //Model 
         let listingModel = findModel(title) ? findModel(title) : findModel(formattedDescription);
 
-
-        listingObject.price = parseFloat(formattedPrice);
-        listingObject.model_id = modelIds[listingModel];
+        //Location
+        let location = document.querySelector(".product__location dd:nth-child(2)");
+        location = (location) ? location.textContent.split(',')[0].trim() : null;
+        
         listingObject.category_id = 1;
-
+        listingObject.site = 'andelemandele';
+        listingObject.model_id = modelIds[listingModel];
+        listingObject.url = url;
+        listingObject.full_title = title;
+        listingObject.description = formattedDescription;
+        listingObject.memory = findMemory(title) ? findMemory(title) : findMemory(formattedDescription);
+        listingObject.price = parseFloat(formattedPrice);
+        listingObject.location = location;
 
         const dataRows = document.querySelectorAll('.attribute-list > tbody > tr');
         for (let i = 0; i < dataRows.length; i++) {
@@ -118,6 +127,11 @@ async function andeleScraper(url) {
             if (propName.textContent == 'Pievienots') {
                 const date = parseDate(propValue.textContent.trim());
                 listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+            }
+
+            if(propName.textContent == 'Skatījumi') {
+                const views =  parseInt(propValue.textContent.trim());
+                listingObject.views = views;
             }
         }
 
@@ -144,8 +158,6 @@ async function andeleScraper(url) {
     } else {
         await saveToBlacklist(listingData);
     }
-
-    await browser.close();
 }
 
 module.exports = andeleScraper;

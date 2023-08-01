@@ -1,7 +1,7 @@
 const andeleScraper = require('./inc/sites/andeleScraper');
 const ssScraper = require('./inc/sites/ssScraper');
 
-const sites = ['andelemandele', 'ss'];
+const sites = ['ss'];
 
 const sitesConfig = {
     andelemandele: {

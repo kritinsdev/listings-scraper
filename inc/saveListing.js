@@ -10,13 +10,15 @@ async function saveListing(listingData) {
         'Content-Type': 'application/json'
       }
     });
-    if (response.data.url) {
-      console.log('SAVED: ', response.data.url);
+    if (response.data.id) {
+      console.log('SAVED: ', response.data.id);
+      await createListingDetails({
+        id: response.data.id,
+        ...listingData
+      });
     }
   } catch (error) {
-    console.log('=========== ERROR ===========');
     console.error(error.response.data);
-    console.log('=========== ERROR ===========');
   }
 }
 
@@ -31,6 +33,21 @@ async function saveToBlacklist(data) {
     if (response.data.url) {
       console.log(`Saved to BLACKLIST: ${data.skipReason}`);
     }
+  } catch (error) {
+    console.error(error.response.data);
+  }
+}
+
+async function createListingDetails(data) {
+  const apiUrl = `${process.env.API_URL}/details`;
+  try {
+    const response = await axios.post(apiUrl, {listing_id : data.id, ...data}, {
+      headers: {
+        'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log('DETAILS SAVED: ', data.id);
   } catch (error) {
     console.error(error.response.data);
   }

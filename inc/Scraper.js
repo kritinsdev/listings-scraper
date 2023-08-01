@@ -19,7 +19,7 @@ class Scraper {
 
     async scrape() {
         const browser = await puppeteer.launch({
-            headless: "new",
+            headless: false,
         });
 
         let blacklistUrls = await getBlacklistUrls(this.currentSite);
@@ -29,6 +29,10 @@ class Scraper {
         this.existingListingUrls = existingListingUrls.map(obj => obj.url);
 
         const page = await browser.newPage();
+
+        if (this.currentSite === 'andelemandele') {
+            await this.loginAndele(page);
+        }
 
         await page.goto(this.firstPage);
 
@@ -46,7 +50,7 @@ class Scraper {
         for (const url of newLinks) {
             const delay = getRandomTimeout(2,4);
 
-            await this.siteConfig.scraper(url);
+            await this.siteConfig.scraper(url, browser);
 
             await sleep(delay);
         }
