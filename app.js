@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const Scraper = require('./inc/Scraper');
 const {sitesConfig, sites} = require('./siteConfig');
 
-cron.schedule('*/2 * * * *', () => {
+cron.schedule('*/5 * * * *', () => {
     console.log('===================================================');
     console.log('Cron job started at', new Date().toLocaleString());
     start();
