@@ -11,7 +11,6 @@ async function saveListing(listingData) {
       }
     });
     if (response.data.id) {
-      console.log('================');
       console.log(`SAVED: ${response.data.id} / ${response.data.url}`);
       await createListingDetails({
         id: response.data.id,
@@ -48,8 +47,6 @@ async function createListingDetails(data) {
         'Content-Type': 'application/json'
       }
     });
-    console.log('DETAILS SAVED: ', data.id);
-    console.log('================');
   } catch (error) {
     console.error(error.response.data);
   }

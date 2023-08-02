@@ -20,7 +20,7 @@ class Scraper {
 
     async scrape() {
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: "new",
         });
 
         let blacklistUrls = await getBlacklistUrls(this.currentSite);
@@ -31,20 +31,9 @@ class Scraper {
 
         const page = await browser.newPage();
 
-        if (this.currentSite === 'facebook') {
-            await this.loginFacebook(page);
-        }
-
         await page.goto(this.firstPage);
 
-        switch(this.currentSite) {
-            case 'facebook':
-                await this.collectFacebookUrls()
-                break;
-            default:
-                await this.collectUrls(page, await this.getTotalPages(page));
-                break;
-        }
+        await this.collectUrls(page, await this.getTotalPages(page));
 
         let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
 
