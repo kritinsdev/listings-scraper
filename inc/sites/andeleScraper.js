@@ -12,7 +12,8 @@ async function andeleScraper(url, browser) {
     const args = {
         url: url,
         models: models,
-        modelIds: modelIds
+        modelIds: modelIds,
+        // categoryId: cat
         //category id
     }
 

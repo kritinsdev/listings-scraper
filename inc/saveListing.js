@@ -11,7 +11,8 @@ async function saveListing(listingData) {
       }
     });
     if (response.data.id) {
-      console.log('SAVED: ', response.data.id);
+      console.log('================');
+      console.log(`SAVED: ${response.data.id} / ${response.data.url}`);
       await createListingDetails({
         id: response.data.id,
         ...listingData
@@ -48,6 +49,7 @@ async function createListingDetails(data) {
       }
     });
     console.log('DETAILS SAVED: ', data.id);
+    console.log('================');
   } catch (error) {
     console.error(error.response.data);
   }

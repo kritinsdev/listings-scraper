@@ -9,7 +9,8 @@ class Scraper {
         this.siteConfig = config;
         this.scrapedListingUrls = [];
         this.currentSite = this.siteConfig.sitename;
-        this.firstPage = (this.siteConfig.categories.phone) ? this.siteConfig.categories.phone.url : null;
+        this.firstPage = this.siteConfig.categories.phone.url;
+        this.categoryId = this.siteConfig.categories;
         this.scrapeOnlyFirstPage = this.siteConfig['scrapeOnlyFirst'];
         this.existingListingsFullUrls = null;
         this.existingListingUrls = [];
@@ -30,13 +31,20 @@ class Scraper {
 
         const page = await browser.newPage();
 
-        if (this.currentSite === 'andelemandele') {
-            await this.loginAndele(page);
+        if (this.currentSite === 'facebook') {
+            await this.loginFacebook(page);
         }
 
         await page.goto(this.firstPage);
 
-        await this.collectUrls(page, await this.getTotalPages(page));
+        switch(this.currentSite) {
+            case 'facebook':
+                await this.collectFacebookUrls()
+                break;
+            default:
+                await this.collectUrls(page, await this.getTotalPages(page));
+                break;
+        }
 
         let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
 
@@ -84,11 +92,15 @@ class Scraper {
                 for (let i = 0; i < totalPages; i++) {
                     const delay = getRandomTimeout(1, 2);
                     const pageUrl = (i === 0) ? this.firstPage : `${this.firstPage}/page:${i}`;
-                    await page.goto(pageUrl);
-                    await page.waitForSelector('.products .product-card__link');
-                    const links = await page.$$eval('.products .product-card__link', elements => elements.map(el => el.href));
-                    this.scrapedListingUrls.push(...links);
-                    await sleep(delay);
+                    try {
+                        await page.goto(pageUrl);
+                        await page.waitForSelector('.products .product-card__link');
+                        const links = await page.$$eval('.products .product-card__link', elements => elements.map(el => el.href));
+                        this.scrapedListingUrls.push(...links);
+                        await sleep(delay);
+                    } catch(error) {
+                        console.log(error);
+                    }
                 }
                 break;
 
@@ -106,6 +118,10 @@ class Scraper {
             default:
                 break;
         }
+    }
+
+    async collectFacebookUrls() {
+        // Facebook infinite scroll functionality
     }
 
     async checkUrlsForUpdates() {
@@ -251,6 +267,32 @@ class Scraper {
         await Promise.all([
             page.waitForNavigation(),
             page.click('#passwordNext > div > button'),
+        ]);
+        await sleep(delay);
+    }
+
+    async loginFacebook(page) {
+        let delay = getRandomTimeout(1, 3);
+        await page.goto('https://www.facebook.com/');
+        await sleep(delay);
+        
+        delay = getRandomTimeout(1, 3);
+        await Promise.all([
+            page.click('[data-cookiebanner="accept_button"]'),
+        ]);
+        await sleep(delay);
+
+        delay = getRandomTimeout(1, 3);
+        await page.type('[data-testid="royal_email"]', process.env.FB_USERNAME);
+        await sleep(delay);
+
+        delay = getRandomTimeout(1, 3);
+        await page.type('[data-testid="royal_pass"]', process.env.FB_PASSWORD);
+        await sleep(delay);
+
+        delay = getRandomTimeout(1, 3);
+        await Promise.all([
+            page.click('[data-testid="royal_login_button"]'),
         ]);
         await sleep(delay);
     }
