@@ -4,7 +4,7 @@ const { saveListing, saveToBlacklist } = require('../saveListing');
 const { models, modelIds } = require('../helpers')
 puppeteer.use(StealthPlugin());
 
-async function andeleScraper(url, browser) {
+async function andeleScraper(url, browser, categoryId) {
     const page = await browser.newPage();
     
     await page.goto(url);
@@ -13,11 +13,10 @@ async function andeleScraper(url, browser) {
         url: url,
         models: models,
         modelIds: modelIds,
-        // categoryId: cat
-        //category id
+        categoryId: categoryId
     }
 
-    const listingData = await page.evaluate((url, models, modelIds) => {
+    const listingData = await page.evaluate((args) => {
         const listingObject = {};
 
         const unavailable = document.querySelector('.block-404__logo');
@@ -67,9 +66,10 @@ async function andeleScraper(url, browser) {
         }
 
         function findModel(string) {
+            if(!string) return;
             const formattedText = string.toLowerCase();
             const regex = new RegExp(
-                `(${models.join('|').replace(/\s+/g, '\\s')})(?![0-9])`,
+                `(${args.models.join('|').replace(/\s+/g, '\\s')})(?![0-9])`,
                 'gi'
             );
             const match = formattedText.match(regex);
@@ -77,6 +77,7 @@ async function andeleScraper(url, browser) {
         }
 
         function findMemory(string) {
+            if(!string) return;
             const ft = string.toLowerCase();
             const regex = new RegExp('(\\d+)\\s*gb\\b', 'i');
             const hasMatch = ft.match(regex);
@@ -110,10 +111,10 @@ async function andeleScraper(url, browser) {
         let location = document.querySelector(".product__location dd:nth-child(2)");
         location = (location) ? location.textContent.split(',')[0].trim() : null;
         
-        listingObject.category_id = 1;
         listingObject.site = 'andelemandele';
-        listingObject.model_id = modelIds[listingModel];
-        listingObject.url = url;
+        listingObject.category_id = args.categoryId;
+        listingObject.model_id = args.modelIds[listingModel];
+        listingObject.url = args.url;
         listingObject.full_title = title;
         listingObject.description = formattedDescription;
         listingObject.memory = findMemory(title) ? findMemory(title) : findMemory(formattedDescription);
@@ -138,20 +139,21 @@ async function andeleScraper(url, browser) {
 
         if(!listingModel || !listingObject.model_id) {
             listingObject.skip = true;
-            listingObject.skipReason = `Could not find model / URL: ${url}`;
+            listingObject.skipReason = `Could not find model / URL: ${args.url}`;
         }
 
         if(listingObject.price < 50) {
             listingObject.skip = true;
-            listingObject.skipReason = `Price is less than 50 euros / URL: ${url}`;
+            listingObject.skipReason = `Price is less than 50 euros / URL: ${args.url}`;
         }
 
         return listingObject;
 
-    }, url, models, modelIds);
+    }, args);
 
     if (!listingData.skip) {
         try {
+            console.log(listingData);
             await saveListing(listingData);
         } catch (error) {
             console.error('Error while saving data to DB', error);
@@ -159,6 +161,8 @@ async function andeleScraper(url, browser) {
     } else {
         await saveToBlacklist(listingData);
     }
+
+    await page.close();
 }
 
 module.exports = andeleScraper;

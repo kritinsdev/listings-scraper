@@ -9,8 +9,7 @@ class Scraper {
         this.siteConfig = config;
         this.scrapedListingUrls = [];
         this.currentSite = this.siteConfig.sitename;
-        this.firstPage = this.siteConfig.categories.phone.url;
-        this.categoryId = this.siteConfig.categories;
+        this.categories = this.siteConfig.categories;
         this.scrapeOnlyFirstPage = this.siteConfig['scrapeOnlyFirst'];
         this.existingListingsFullUrls = null;
         this.existingListingUrls = [];
@@ -20,7 +19,7 @@ class Scraper {
 
     async scrape() {
         const browser = await puppeteer.launch({
-            headless: "new",
+            headless: false,
         });
 
         let blacklistUrls = await getBlacklistUrls(this.currentSite);
@@ -29,31 +28,37 @@ class Scraper {
         let existingListingUrls = await getExistingUrls(this.currentSite);
         this.existingListingUrls = existingListingUrls.map(obj => obj.url);
 
-        const page = await browser.newPage();
-
-        await page.goto(this.firstPage);
-
-        await this.collectUrls(page, await this.getTotalPages(page));
-
         let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
 
-        let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
-        if (newLinks.length > 0) {
-            console.log(`${newLinks.length} new listings. Scraping...`)
-        } else {
-            console.log('No new listings');
+        const page = await browser.newPage();
+
+        for (const key in this.categories) {
+            const categoryId = this.categories[key].id;
+            const categoryUrl = this.categories[key].url;
+
+            await page.goto(categoryUrl);
+
+            await this.collectUrls(page, await this.getTotalPages(page), categoryUrl);
+
+            let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
+            
+            if (newLinks.length > 0) {
+                console.log(`${newLinks.length} new listings. Scraping...`)
+            } else {
+                console.log('No new listings');
+            }
+
+            for (const url of newLinks) {
+                const delay = getRandomTimeout(2, 4);
+
+                await this.siteConfig.scraper(url, browser, categoryId);
+
+                await sleep(delay);
+            }
         }
-
-        for (const url of newLinks) {
-            const delay = getRandomTimeout(2,4);
-
-            await this.siteConfig.scraper(url, browser);
-
-            await sleep(delay);
-        }
-
         console.log('Finished scraping.')
         await browser.close();
+
     }
 
     async getTotalPages(page) {
@@ -75,19 +80,19 @@ class Scraper {
         }
     }
 
-    async collectUrls(page, totalPages) {
+    async collectUrls(page, totalPages, firstPage) {
         switch (this.currentSite) {
             case 'andelemandele':
                 for (let i = 0; i < totalPages; i++) {
                     const delay = getRandomTimeout(1, 2);
-                    const pageUrl = (i === 0) ? this.firstPage : `${this.firstPage}/page:${i}`;
+                    const pageUrl = (i === 0) ? firstPage : `${firstPage}/page:${i}`;
                     try {
                         await page.goto(pageUrl);
                         await page.waitForSelector('.products .product-card__link');
                         const links = await page.$$eval('.products .product-card__link', elements => elements.map(el => el.href));
                         this.scrapedListingUrls.push(...links);
                         await sleep(delay);
-                    } catch(error) {
+                    } catch (error) {
                         console.log(error);
                     }
                 }
@@ -107,10 +112,6 @@ class Scraper {
             default:
                 break;
         }
-    }
-
-    async collectFacebookUrls() {
-        // Facebook infinite scroll functionality
     }
 
     async checkUrlsForUpdates() {
@@ -264,7 +265,7 @@ class Scraper {
         let delay = getRandomTimeout(1, 3);
         await page.goto('https://www.facebook.com/');
         await sleep(delay);
-        
+
         delay = getRandomTimeout(1, 3);
         await Promise.all([
             page.click('[data-cookiebanner="accept_button"]'),
@@ -284,6 +285,10 @@ class Scraper {
             page.click('[data-testid="royal_login_button"]'),
         ]);
         await sleep(delay);
+    }
+
+    async collectFacebookUrls() {
+        // Facebook infinite scroll functionality
     }
 }
 

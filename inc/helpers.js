@@ -41,8 +41,17 @@ const unsortedModels = [
     '14 pro',
     '14 pro max',
     'playstation 3',
+    'ps3',
     'playstation 4',
+    'ps4',
     'playstation 5',
+    'ps5',
+    'nintendo switch',
+    'steam deck',
+    'xbox 360',
+    'xbox one',
+    'xbox series s',
+    'xbox series x',
 ];
 const models = unsortedModels.sort((a, b) => b.length - a.length);
 
@@ -75,6 +84,18 @@ const modelIds = {
     '14 plus': 26,
     '14 pro': 27,
     '14 pro max': 28,
+    'playstation 3': 29,
+    'ps3': 29,
+    'playstation 4': 30,
+    'ps4': 30,
+    'playstation 5': 31,
+    'ps5': 31,
+    'nintendo switch': 32,
+    'steam deck': 33,
+    'xbox 360': 34,
+    'xbox one': 35,
+    'xbox series s': 36,
+    'xbox series x': 37,
 };
 
 
