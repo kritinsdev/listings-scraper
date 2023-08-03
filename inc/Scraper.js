@@ -49,8 +49,9 @@ class Scraper {
             }
 
             for (const url of newLinks) {
-                const delay = getRandomTimeout(2, 4);
 
+                const delay = getRandomTimeout(2, 4);
+           
                 await this.siteConfig.scraper(url, browser, categoryId);
 
                 await sleep(delay);
@@ -101,7 +102,7 @@ class Scraper {
             case 'ss':
                 for (let i = 1; i <= totalPages; i++) {
                     const delay = getRandomTimeout(1, 2);
-                    const pageUrl = (i === 1) ? this.firstPage : `${this.firstPage}/page${i}.html`;
+                    const pageUrl = (i === 1) ? firstPage : `${firstPage}/page${i}.html`;
                     await page.goto(pageUrl);
                     await page.waitForSelector('.top_head');
                     const links = await page.$$eval('.d1 .am', elements => elements.map(el => el.href));

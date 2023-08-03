@@ -2,11 +2,15 @@ const cron = require('node-cron');
 const Scraper = require('./inc/Scraper');
 const {sitesConfig, sites} = require('./siteConfig');
 
-// cron.schedule('*/5 * * * *', () => {
-//     console.log('===================================================');
-//     console.log('Cron job started at', new Date().toLocaleString());
-//     start();
-// });
+// const MM = require('./inc/ModelManager');
+// const res = MM.findModel('Apple iPhone X', 1);
+// console.log(res);
+
+// // cron.schedule('*/5 * * * *', () => {
+// //     console.log('===================================================');
+// //     console.log('Cron job started at', new Date().toLocaleString());
+// //     start();
+// // });
 
 async function start() {
     for(let i = 0; i < sites.length; i++) {

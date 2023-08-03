@@ -1,28 +1,26 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { saveListing, saveToBlacklist } = require('../saveListing');
-const { models, modelIds } = require('../helpers')
+const MM = require('../ModelManager');
 puppeteer.use(StealthPlugin());
 
 async function andeleScraper(url, browser, categoryId) {
     const page = await browser.newPage();
-    
+
     await page.goto(url);
-    
+
     const args = {
         url: url,
-        models: models,
-        modelIds: modelIds,
-        categoryId: categoryId
+        category: categoryId
     }
 
     const listingData = await page.evaluate((args) => {
         const listingObject = {};
 
         const unavailable = document.querySelector('.block-404__logo');
-        if(unavailable) {
+        if (unavailable) {
             listingObject.skip = true;
-            listingObject.skipReason = '404 listing is sold or removed';
+            listingObject.skipReason = 'Listing is sold or removed';
             return listingObject;
         }
 
@@ -65,19 +63,8 @@ async function andeleScraper(url, browser, categoryId) {
             return new Date(today.getFullYear(), month, day, hour, minute);
         }
 
-        function findModel(string) {
-            if(!string) return;
-            const formattedText = string.toLowerCase();
-            const regex = new RegExp(
-                `(${args.models.join('|').replace(/\s+/g, '\\s')})(?![0-9])`,
-                'gi'
-            );
-            const match = formattedText.match(regex);
-            return match ? match[0] : null;
-        }
-
         function findMemory(string) {
-            if(!string) return;
+            if (!string) return;
             const ft = string.toLowerCase();
             const regex = new RegExp('(\\d+)\\s*gb\\b', 'i');
             const hasMatch = ft.match(regex);
@@ -91,11 +78,11 @@ async function andeleScraper(url, browser, categoryId) {
             oldPrice.remove();
         }
         const formattedPrice = price.textContent.replace(/[^0-9.]+/g, '');
-        
+
         // Description
         const description = document.querySelector('.product__descr').textContent.trim();
         const formattedDescription = (description) ? description.replace(/[\n+]/g, ' ') : null;
-        
+
         // Title
         let title = document.querySelector('.product__title');
         const spanElements = title.querySelectorAll('span');
@@ -103,17 +90,14 @@ async function andeleScraper(url, browser, categoryId) {
             spanElement.remove();
         });
         title = title.textContent.replace(/\t|\n/g, '');
-        
-        //Model 
-        let listingModel = findModel(title) ? findModel(title) : findModel(formattedDescription);
 
         //Location
         let location = document.querySelector(".product__location dd:nth-child(2)");
         location = (location) ? location.textContent.split(',')[0].trim() : null;
-        
+
         listingObject.site = 'andelemandele';
-        listingObject.category_id = args.categoryId;
-        listingObject.model_id = args.modelIds[listingModel];
+        listingObject.category_id = args.category;
+        listingObject.model_id = null;
         listingObject.url = args.url;
         listingObject.full_title = title;
         listingObject.description = formattedDescription;
@@ -131,38 +115,51 @@ async function andeleScraper(url, browser, categoryId) {
                 listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
             }
 
-            if(propName.textContent == 'Skatījumi') {
-                const views =  parseInt(propValue.textContent.trim());
+            if (propName.textContent == 'Skatījumi') {
+                const views = parseInt(propValue.textContent.trim());
                 listingObject.views = views;
             }
         }
 
-        if(!listingModel || !listingObject.model_id) {
-            listingObject.skip = true;
-            listingObject.skipReason = `Could not find model / URL: ${args.url}`;
-        }
-
-        if(listingObject.price < 50) {
+        if (listingObject.price < 50) {
             listingObject.skip = true;
             listingObject.skipReason = `Price is less than 50 euros / URL: ${args.url}`;
+            return listingObject;
         }
 
         return listingObject;
-
     }, args);
 
     if (!listingData.skip) {
-        try {
-            console.log(listingData);
-            await saveListing(listingData);
-        } catch (error) {
-            console.error('Error while saving data to DB', error);
+        const model = findModel(listingData);
+        listingData.model_id = model;
+
+        if (model) {
+            try {
+                await saveListing(listingData);
+            } catch (error) {
+                console.error('Error while saving data to DB', error);
+            }
+        } else {
+            console.log(`===> MODEL NOT FOUND | TITLE: ${listingData.full_title} / URL: ${listingData.url}`)
         }
+
     } else {
         await saveToBlacklist(listingData);
     }
 
     await page.close();
+}
+
+function findModel(listingData) {
+    let model = null;
+    let listingModel = MM.findModel(listingData.full_title, listingData.category_id);
+    if (!listingModel) listingModel = MM.findModel(listingData.description, listingData.category_id);
+    if (listingModel) {
+        model = MM.getModelId(listingData.category_id, listingModel);
+    }
+
+    return model;
 }
 
 module.exports = andeleScraper;

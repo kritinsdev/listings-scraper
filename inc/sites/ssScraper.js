@@ -1,16 +1,20 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { saveListing, saveToBlacklist } = require('../saveListing');
-const { modelIds } = require('../helpers');
+const MM = require('../ModelManager');
 puppeteer.use(StealthPlugin());
 
-async function ssScraper(url, browser) {
+async function ssScraper(url, browser, categoryId) {
     const page = await browser.newPage();
 
     await page.goto(url);
+    
+    const args = {
+        url: url,
+        category: categoryId
+    }
 
-    const listingData = await page.evaluate((url, modelIds) => {
-
+    const listingData = await page.evaluate((args) => {
         function parseDateString(dateString) {
             const cleanedDateString = dateString.replace('Datums: ', '');
         
@@ -28,7 +32,7 @@ async function ssScraper(url, browser) {
         }
 
         const listingObject = {};
-        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'гарантия', 'Pērkam visus', 'pērkam visus']
+        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'Pērkam visus', 'pērkam visus']
 
         // Price
         let price = document.querySelector('.ads_price');
@@ -89,10 +93,10 @@ async function ssScraper(url, browser) {
         text = text.replace(/\n{2,}/g, '\n');
 
         listingObject.site = 'ss';
-        listingObject.category_id = 1;
-        listingObject.url = url;
+        listingObject.category_id = args.category;
+        listingObject.url = args.url;
         listingObject.price = price;
-        listingObject.model_id = modelIds[model];
+        listingObject.model_id = model;
         listingObject.memory = memory;
         listingObject.description = text;
         listingObject.full_title = null;
@@ -103,32 +107,53 @@ async function ssScraper(url, browser) {
 
         if(listingObject.price < 50) {
             listingObject.skip = true;
-            listingObject.skipReason = `Price is less than 50 euros / URL: ${url}`;
+            listingObject.skipReason = `Price is less than 50 euros / URL: ${args.url}`;
         }
 
         if(!listingObject.model_id) {
             listingObject.skip = true;
-            listingObject.skipReason = `Could not find model / URL: ${url}`;
+            listingObject.skipReason = `Could not find model / URL: ${args.url}`;
         }
 
         if(isBlacklisted) {
             listingObject.skip = true;
-            listingObject.skipReason = `Contains blacklisted word / URL: ${url}`;
+            listingObject.skipReason = `Contains blacklisted word / URL: ${args.url}`;
         }
 
         return listingObject;
 
-    }, url, modelIds);
+    }, args);
 
     if (!listingData.skip) {
-        try {
-            await saveListing(listingData);
-        } catch (error) {
-            console.error('Error while saving data to DB', error);
+        const model = findModel(listingData);
+        listingData.model_id = model;
+        listingData.ssModel = listingData.model_id;
+
+        if (model) {
+            try {
+                await saveListing(listingData);
+            } catch (error) {
+                console.error('Error while saving data to DB', error);
+            }
+        } else {
+            console.log(`===> MODEL NOT FOUND | TITLE: ${listingData.full_title} / URL: ${listingData.url}`)
         }
+
     } else {
         await saveToBlacklist(listingData);
     }
+
+    await page.close();
+}
+
+function findModel(listingData) {
+    let listingModel = MM.findModel(listingData.model_id, listingData.category_id);
+    if (!listingModel) listingModel = MM.findModel(listingData.description, listingData.category_id);
+    if (listingModel) {
+        model = MM.getModelId(listingData.category_id, listingModel);
+    }
+
+    return model;
 }
 
 module.exports = ssScraper;

@@ -11,7 +11,7 @@ async function saveListing(listingData) {
       }
     });
     if (response.data.id) {
-      console.log(`SAVED: ${response.data.id} / ${response.data.url}`);
+      console.log(`LISTING_SAVED | LISTING_ID: ${response.data.id} ${listingData.site === 'andelemandele' ? `| TITLE: ${listingData.full_title}` : ''} |  MODEL: ${response.data.model} | URL: ${listingData.url}`);
       await createListingDetails({
         id: response.data.id,
         ...listingData
