@@ -1,45 +1,34 @@
 class ModelManager {
-    constructor(categories, models) {
+    constructor(models) {
         this.modelIds = new Map();
-        this.category = categories;
 
         models.forEach((modelData) => {
-            this.addMultipleModels(modelData.category, modelData.models);
+            this.addMultipleModels(modelData.models);
         });
     }
 
-    addModel(category, modelName, modelId) {
-        if (!this.modelIds.has(category)) {
-            console.warn(`Category ${category} does not exist.`);
-            return;
-        }
-
+    addModel(modelName, modelId) {
         const formattedModelName = modelName.toLowerCase();
-        if (!this.modelIds.get(category).has(formattedModelName)) {
-            this.modelIds.get(category).set(formattedModelName, modelId);
+        if (!this.modelIds.has(formattedModelName)) {
+            this.modelIds.set(formattedModelName, modelId);
         }
     }
 
-    addMultipleModels(category, models) {
-        if (!this.modelIds.has(category)) {
-            this.modelIds.set(category, new Map());
-        }
-
+    addMultipleModels(models) {
         models.forEach((model) => {
-            this.addModel(category, model.name, model.id);
+            this.addModel(model.name, model.id);
         });
     }
 
-    getModelId(category, modelName) {
-        if (!this.modelIds.has(category)) return null;
+    getModelId(modelName) {
         const formattedModelName = modelName.toLowerCase();
-        return this.modelIds.get(category).get(formattedModelName) || null;
+        return this.modelIds.get(formattedModelName) || null;
     }
 
-    findModel(string, category) {
-        if (!string || !this.modelIds.has(category)) return null;
+    findModel(string) {
+        if (!string) return null;
         const formattedText = this.removeExtraSpaces(string.toLowerCase());
-        const models = Array.from(this.modelIds.get(category).keys());
+        const models = Array.from(this.modelIds.keys());
         models.sort((a, b) => b.length - a.length);
         const regex = new RegExp(`\\b(${models.join('|').replace(/\s+/g, '\\s')})\\b`, 'i');
         const regexWithoutSpace = new RegExp(`\\b(${models.join('|').replace(/\s+/g, '')})(?=[a-z0-9]|$)`, 'i');
@@ -55,14 +44,8 @@ class ModelManager {
     }
 }
 
-const categories = {
-    1: 'Phone',
-    2: 'Game Console',
-};
-
 const models = [
     {
-        category: 1,
         models: [
             { name: 'iPhone 6', id: 1 },
             { name: '6', id: 1 },
@@ -134,36 +117,8 @@ const models = [
             { name: '14 pro max', id: 28 },
         ],
     },
-    {
-        category: 2,
-        models: [
-            { name: 'Playstation 3', id: 29 },
-            { name: 'Play station 3', id: 29 },
-            { name: 'ps 3', id: 29 },
-            { name: 'ps3', id: 29 },
-            { name: 'Playstation 4', id: 30 },
-            { name: 'Playstation 4slim', id: 30 },
-            { name: 'Play station 4', id: 30 },
-            { name: 'ps 4', id: 30 },
-            { name: 'ps4', id: 30 },
-            { name: 'Playstation 5', id: 31 },
-            { name: 'Play station 5', id: 31 },
-            { name: 'ps 5', id: 31 },
-            { name: 'ps5', id: 31 },
-            { name: 'Nintendo Switch', id: 32 },
-            { name: 'Steam Deck', id: 33 },
-            { name: 'Xbox 360', id: 34 },
-            { name: 'xbox360', id: 34 },
-            { name: 'Xbox One', id: 35 },
-            { name: 'Xbox series S', id: 36 },
-            { name: 'Xbox sērija S', id: 36 },
-            { name: 'Xbox series X', id: 37 },
-            { name: 'Xbox sērija X', id: 37 },
-        ]
-    }
 ];
 
-
-const MM = new ModelManager(categories, models);
+const MM = new ModelManager(models);
 
 module.exports = MM;

@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { getRandomTimeout, sleep, getExistingUrls, getBlacklistUrls } = require('./helpers');
-const { updateListing } = require('./updateListing');
 puppeteer.use(StealthPlugin());
 
 class Scraper {
@@ -9,7 +8,7 @@ class Scraper {
         this.siteConfig = config;
         this.scrapedListingUrls = [];
         this.currentSite = this.siteConfig.sitename;
-        this.categories = this.siteConfig.categories;
+        this.pageUrl = this.siteConfig.url;
         this.scrapeOnlyFirstPage = this.siteConfig['scrapeOnlyFirst'];
         this.existingListingsFullUrls = null;
         this.existingListingUrls = [];
@@ -19,7 +18,7 @@ class Scraper {
 
     async scrape() {
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: "new",
         });
 
         let blacklistUrls = await getBlacklistUrls(this.currentSite);
@@ -32,30 +31,25 @@ class Scraper {
 
         const page = await browser.newPage();
 
-        for (const key in this.categories) {
-            const categoryId = this.categories[key].id;
-            const categoryUrl = this.categories[key].url;
+        await page.goto(this.pageUrl);
 
-            await page.goto(categoryUrl);
+        await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
 
-            await this.collectUrls(page, await this.getTotalPages(page), categoryUrl);
+        let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
 
-            let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
-            
-            if (newLinks.length > 0) {
-                console.log(`${newLinks.length} new listings. Scraping...`)
-            } else {
-                console.log('No new listings');
-            }
+        if (newLinks.length > 0) {
+            console.log(`${newLinks.length} new listings. Scraping...`)
+        } else {
+            console.log('No new listings');
+        }
 
-            for (const url of newLinks) {
+        for (const url of newLinks) {
 
-                const delay = getRandomTimeout(2, 4);
-           
-                await this.siteConfig.scraper(url, browser, categoryId);
+            const delay = getRandomTimeout(2, 4);
 
-                await sleep(delay);
-            }
+            await this.siteConfig.scraper(url, browser);
+
+            await sleep(delay);
         }
         console.log('Finished scraping.')
         await browser.close();
@@ -115,153 +109,6 @@ class Scraper {
         }
     }
 
-    async checkUrlsForUpdates() {
-        const browser = await puppeteer.launch({
-            headless: "new",
-        });
-        const page = await browser.newPage();
-
-        if (this.currentSite === 'andelemandele') {
-            await this.loginAndele(page);
-        }
-
-        const existingUrls = await getExistingUrls(this.currentSite, 1);
-
-        for (let i = 0; i < existingUrls.length; i++) {
-            const delay = getRandomTimeout(1, 2);
-            const id = existingUrls[i].id;
-
-            await page.goto(existingUrls[i].url, { waitUntil: 'networkidle0' });
-
-            if (this.currentSite === 'andelemandele') {
-                const listing = await page.evaluate((id) => {
-                    const listing = {};
-                    listing.active = 1;
-                    listing.id = id;
-
-                    //Checks
-                    const unavailable = document.querySelector('.block-404__logo');
-                    let sold = document.querySelector('.alert-info'); // wait for this selector
-                    sold = (sold) ? sold.textContent.trim() : null;
-                    // Price
-                    const price = document.querySelector('.product__price');
-                    const oldPrice = (price) ? price.querySelector('s') : null;
-                    if (oldPrice) {
-                        oldPrice.remove();
-                    }
-
-                    const formattedPrice = (price) ? price.textContent.replace(/[^0-9.]+/g, '') : null;
-
-                    if (formattedPrice) {
-                        listing.price = parseFloat(formattedPrice);
-                    }
-
-                    // if(response.status() === 404){
-                    //     listing.active = 0;
-                    //     listing.info = `404: Listing is removed / ID:${listing.id}`;
-                    // }
-
-                    if (unavailable) {
-                        listing.active = 0;
-                        listing.info = `404: Listing is removed / ID:${listing.id}`;
-                    }
-
-                    if (sold && sold.toLowerCase() == 'šī pērle ir nomedīta.') {
-                        listing.active = 0;
-                        listing.info = `${sold} / ID:${listing.id}`;
-                    }
-
-                    return listing;
-                }, id);
-
-                if (listing) {
-                    try {
-                        await updateListing(listing);
-                    } catch (error) {
-                        console.error('Error while saving data to DB', error);
-                    }
-                }
-            }
-
-            if (this.currentSite === 'ss') {
-                const listing = await page.evaluate((id) => {
-                    const listing = {};
-                    listing.id = id;
-                    listing.active = 1;
-
-                    // Price
-                    let price = (document.querySelector('.ads_price')) ? document.querySelector('.ads_price').textContent : null;
-
-                    //Archive
-                    let archive = (document.querySelector('img[src="https://i.ss.lv/img/a_lv.gif"]')) ? true : false;
-
-                    if (price) {
-                        price = price.replace(/\D/g, '');
-                        price = parseFloat(price);
-                        listing.price = price;
-                    }
-
-                    // if(response.status() === 404){
-                    //     listing.active = 0;
-                    //     listing.info = `404: Listing is removed / ID:${listing.id}`;
-                    // }
-
-                    if (!price) {
-                        listing.active = 0;
-                        listing.info = `Listing missing price / ID:${listing.id}`;
-                    }
-
-                    if (archive) {
-                        listing.active = 0;
-                        listing.info = `Listing is in archive / ID:${listing.id}`;
-                    }
-
-                    return listing;
-                }, id);
-
-                if (listing) {
-                    try {
-                        await updateListing(listing);
-                    } catch (error) {
-                        console.error('Error while saving data to DB', error);
-                    }
-                }
-            }
-
-            await sleep(delay);
-        }
-
-        await browser.close();
-    }
-
-    async loginAndele(page) {
-        let delay = getRandomTimeout(1, 3);
-        await page.goto('https://www.andelemandele.lv/login/authorize/google/?back=%2F');
-        await sleep(delay);
-
-        delay = getRandomTimeout(1, 3);
-        await page.type('input#identifierId', process.env.GMAIL_USERNAME);
-        await sleep(delay);
-
-        await Promise.all([
-            page.waitForNavigation(),
-            page.click('#identifierNext > div > button'),
-        ]);
-        await sleep(delay);
-
-        delay = getRandomTimeout(1, 3);
-        await page.type('#password > div.aCsJod.oJeWuf > div > div.Xb9hP > input', process.env.GMAIL_PASSWORD);
-        await sleep(delay);
-
-
-        delay = getRandomTimeout(1, 3);
-        await Promise.all([
-            page.waitForNavigation(),
-            page.click('#passwordNext > div > button'),
-        ]);
-        await sleep(delay);
-    }
-
     async loginFacebook(page) {
         let delay = getRandomTimeout(1, 3);
         await page.goto('https://www.facebook.com/');
@@ -286,10 +133,6 @@ class Scraper {
             page.click('[data-testid="royal_login_button"]'),
         ]);
         await sleep(delay);
-    }
-
-    async collectFacebookUrls() {
-        // Facebook infinite scroll functionality
     }
 }
 

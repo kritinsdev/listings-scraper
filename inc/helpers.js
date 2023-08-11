@@ -40,18 +40,6 @@ const unsortedModels = [
     '14+',
     '14 pro',
     '14 pro max',
-    'playstation 3',
-    'ps3',
-    'playstation 4',
-    'ps4',
-    'playstation 5',
-    'ps5',
-    'nintendo switch',
-    'steam deck',
-    'xbox 360',
-    'xbox one',
-    'xbox series s',
-    'xbox series x',
 ];
 const models = unsortedModels.sort((a, b) => b.length - a.length);
 

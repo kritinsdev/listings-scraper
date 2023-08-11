@@ -4,14 +4,13 @@ const { saveListing, saveToBlacklist } = require('../saveListing');
 const MM = require('../ModelManager');
 puppeteer.use(StealthPlugin());
 
-async function andeleScraper(url, browser, categoryId) {
+async function andeleScraper(url, browser) {
     const page = await browser.newPage();
 
     await page.goto(url);
 
     const args = {
         url: url,
-        category: categoryId
     }
 
     const listingData = await page.evaluate((args) => {
@@ -91,19 +90,13 @@ async function andeleScraper(url, browser, categoryId) {
         });
         title = title.textContent.replace(/\t|\n/g, '');
 
-        //Location
-        let location = document.querySelector(".product__location dd:nth-child(2)");
-        location = (location) ? location.textContent.split(',')[0].trim() : null;
-
         listingObject.site = 'andelemandele';
-        listingObject.category_id = args.category;
         listingObject.model_id = null;
         listingObject.url = args.url;
         listingObject.full_title = title;
         listingObject.description = formattedDescription;
         listingObject.memory = findMemory(title) ? findMemory(title) : findMemory(formattedDescription);
         listingObject.price = parseFloat(formattedPrice);
-        listingObject.location = location;
 
         const dataRows = document.querySelectorAll('.attribute-list > tbody > tr');
         for (let i = 0; i < dataRows.length; i++) {
@@ -113,11 +106,6 @@ async function andeleScraper(url, browser, categoryId) {
             if (propName.textContent == 'Pievienots') {
                 const date = parseDate(propValue.textContent.trim());
                 listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
-            }
-
-            if (propName.textContent == 'Skatījumi') {
-                const views = parseInt(propValue.textContent.trim());
-                listingObject.views = views;
             }
         }
 
@@ -133,10 +121,11 @@ async function andeleScraper(url, browser, categoryId) {
     if (!listingData.skip) {
         const model = findModel(listingData);
         listingData.model_id = model;
-
+        
+        console.log(listingData);
         if (model) {
             try {
-                await saveListing(listingData);
+                // await saveListing(listingData);
             } catch (error) {
                 console.error('Error while saving data to DB', error);
             }
@@ -145,18 +134,18 @@ async function andeleScraper(url, browser, categoryId) {
         }
 
     } else {
-        await saveToBlacklist(listingData);
+        // await saveToBlacklist(listingData);
     }
 
     await page.close();
 }
 
 function findModel(listingData) {
-    let model = null;
-    let listingModel = MM.findModel(listingData.full_title, listingData.category_id);
-    if (!listingModel) listingModel = MM.findModel(listingData.description, listingData.category_id);
+    let model = 1;
+    let listingModel = MM.findModel(listingData.full_title);
+    if (!listingModel) listingModel = MM.findModel(listingData.description);
     if (listingModel) {
-        model = MM.getModelId(listingData.category_id, listingModel);
+        model = MM.getModelId(listingModel);
     }
 
     return model;

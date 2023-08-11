@@ -58,7 +58,8 @@ async function ssScraper(url, browser, categoryId) {
         const isBlacklisted = blacklistedWords.some(word => description.includes(word.toLowerCase()));
 
         //Model 
-        let model = document.querySelector('#tdo_44');
+        let model = args.category === 1 ? document.querySelector('#tdo_44') : document.querySelector('#tdo_1649');
+
         if(model) {
             model = model.textContent.toLowerCase();
             model = model.replace(/apple iphone /gi, "");

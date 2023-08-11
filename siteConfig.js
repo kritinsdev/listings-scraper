@@ -2,8 +2,7 @@ const andeleScraper = require('./inc/sites/andeleScraper');
 const facebookScraper = require('./inc/sites/facebookScraper');
 const ssScraper = require('./inc/sites/ssScraper');
 
-// const sites = ['andelemandele', 'ss'];
-const sites = ['ss'];
+const sites = ['andelemandele', 'ss'];
 
 const sitesConfig = {
     andelemandele: {
@@ -11,16 +10,7 @@ const sitesConfig = {
         selectors: {
             paginator: '.paginator',
         },
-        categories: {
-            phone: {
-                id:1,
-                url:'https://www.andelemandele.lv/perles/elektronika/telefoni/#order:created/brand:3232',
-            },
-            gameConsole: {
-                id:2,
-                url:'https://www.andelemandele.lv/perles/elektronika/videospeles/#order:created'
-            }
-        },
+        url: 'https://www.andelemandele.lv/perles/elektronika/telefoni/#order:created/brand:3232',
         scrapeOnlyFirst: true,
         scraper: andeleScraper,
     },
@@ -30,16 +20,7 @@ const sitesConfig = {
         selectors: {
             paginator: '.td2',
         },
-        categories: {
-            phone: {
-                id:1,
-                url:'https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/',
-            },
-            gameConsole: {
-                id:2,
-                url:'https://www.ss.lv/lv/electronics/computers/game-consoles/sell/'
-            }
-        },
+        url: 'https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/',
         scrapeOnlyFirst: true,
         scraper: ssScraper,
     },
@@ -55,7 +36,7 @@ const sitesConfig = {
                 url:'https://www.facebook.com/marketplace/106273369404765/iphones',
             },
             },
-        scrapeOnlyFirst: true,
+        scrapeOnlyFirst: false,
         scraper: facebookScraper,
     }
 };
