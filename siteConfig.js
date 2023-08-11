@@ -2,7 +2,7 @@ const andeleScraper = require('./inc/sites/andeleScraper');
 const facebookScraper = require('./inc/sites/facebookScraper');
 const ssScraper = require('./inc/sites/ssScraper');
 
-const sites = ['andelemandele', 'ss'];
+const sites = ['andelemandele'];
 
 const sitesConfig = {
     andelemandele: {
@@ -30,12 +30,7 @@ const sitesConfig = {
         selectors: {
             paginator: null,
         },
-        categories: {
-            phone: {
-                id:1,
-                url:'https://www.facebook.com/marketplace/106273369404765/iphones',
-            },
-            },
+        url:'https://www.facebook.com/marketplace/106273369404765/iphones',
         scrapeOnlyFirst: false,
         scraper: facebookScraper,
     }

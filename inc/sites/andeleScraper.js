@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { saveListing, saveToBlacklist } = require('../saveListing');
-const MM = require('../ModelManager');
+const ModelManager = require('../ModelManager');
 puppeteer.use(StealthPlugin());
 
 async function andeleScraper(url, browser) {
@@ -63,12 +63,25 @@ async function andeleScraper(url, browser) {
         }
 
         function findMemory(string) {
-            if (!string) return;
+            if (!string) return null;
             const ft = string.toLowerCase();
-            const regex = new RegExp('(\\d+)\\s*gb\\b', 'i');
-            const hasMatch = ft.match(regex);
-            return hasMatch ? parseInt(hasMatch[1]) : null;
+            const regexGB = new RegExp('(\\d+)\\s*gb\\b', 'i');
+            const regexTB = new RegExp('(\\d+)\\s*tb\\b', 'i');
+        
+            const hasMatchGB = ft.match(regexGB);
+            const hasMatchTB = ft.match(regexTB);
+        
+            if (hasMatchTB) {
+                return parseInt(hasMatchTB[1]) * 1024;
+            }
+        
+            if (hasMatchGB) {
+                return parseInt(hasMatchGB[1]);
+            }
+        
+            return null;
         }
+        
 
         // Price
         const price = document.querySelector('.product__price');
@@ -119,36 +132,24 @@ async function andeleScraper(url, browser) {
     }, args);
 
     if (!listingData.skip) {
-        const model = findModel(listingData);
-        listingData.model_id = model;
-        
+        listingData.model_id = new ModelManager(listingData).findId();
+
         console.log(listingData);
-        if (model) {
+        if (listingData.model_id) {
             try {
-                // await saveListing(listingData);
+                await saveListing(listingData);
             } catch (error) {
                 console.error('Error while saving data to DB', error);
             }
         } else {
             console.log(`===> MODEL NOT FOUND | TITLE: ${listingData.full_title} / URL: ${listingData.url}`)
+            await saveToBlacklist(listingData);
         }
-
     } else {
-        // await saveToBlacklist(listingData);
+        await saveToBlacklist(listingData);
     }
 
     await page.close();
-}
-
-function findModel(listingData) {
-    let model = 1;
-    let listingModel = MM.findModel(listingData.full_title);
-    if (!listingModel) listingModel = MM.findModel(listingData.description);
-    if (listingModel) {
-        model = MM.getModelId(listingModel);
-    }
-
-    return model;
 }
 
 module.exports = andeleScraper;

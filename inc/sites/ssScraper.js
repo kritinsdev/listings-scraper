@@ -94,15 +94,12 @@ async function ssScraper(url, browser, categoryId) {
         text = text.replace(/\n{2,}/g, '\n');
 
         listingObject.site = 'ss';
-        listingObject.category_id = args.category;
         listingObject.url = args.url;
         listingObject.price = price;
         listingObject.model_id = model;
         listingObject.memory = memory;
         listingObject.description = text;
         listingObject.full_title = null;
-        listingObject.views = parseInt(views);
-        listingObject.location = location;
 
         listingObject.added = new Date(added.getTime() - added.getTimezoneOffset() * 60000).toISOString();
 
@@ -148,13 +145,7 @@ async function ssScraper(url, browser, categoryId) {
 }
 
 function findModel(listingData) {
-    let listingModel = MM.findModel(listingData.model_id, listingData.category_id);
-    if (!listingModel) listingModel = MM.findModel(listingData.description, listingData.category_id);
-    if (listingModel) {
-        model = MM.getModelId(listingData.category_id, listingModel);
-    }
-
-    return model;
+    
 }
 
 module.exports = ssScraper;
