@@ -1,17 +1,16 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { saveListing, saveToBlacklist } = require('../saveListing');
-const MM = require('../ModelManager');
+const ModelManager = require('../ModelManager');
 puppeteer.use(StealthPlugin());
 
-async function ssScraper(url, browser, categoryId) {
+async function ssScraper(url, browser) {
     const page = await browser.newPage();
 
     await page.goto(url);
     
     const args = {
         url: url,
-        category: categoryId
     }
 
     const listingData = await page.evaluate((args) => {
@@ -58,7 +57,7 @@ async function ssScraper(url, browser, categoryId) {
         const isBlacklisted = blacklistedWords.some(word => description.includes(word.toLowerCase()));
 
         //Model 
-        let model = args.category === 1 ? document.querySelector('#tdo_44') : document.querySelector('#tdo_1649');
+        let model = document.querySelector('#tdo_44');
 
         if(model) {
             model = model.textContent.toLowerCase();
@@ -72,18 +71,6 @@ async function ssScraper(url, browser, categoryId) {
             added = parseDateString(added);
         }
 
-        //Views
-        let views = document.querySelector('#show_cnt_stat');
-        if(views) {
-            views = views.textContent.trim();
-        }
-
-        //Location
-        let location = document.querySelector('#tr_cont > table > tbody > tr:nth-child(4) > td.ads_contacts');
-        if(location) {
-            location = location.textContent.trim();
-        }
-        
         let element = document.querySelector('#msg_div_msg');
 
         let tables = element.getElementsByTagName('table');
@@ -123,9 +110,7 @@ async function ssScraper(url, browser, categoryId) {
     }, args);
 
     if (!listingData.skip) {
-        const model = findModel(listingData);
-        listingData.model_id = model;
-        listingData.ssModel = listingData.model_id;
+        listingData.model_id = new ModelManager(listingData).findId();
 
         if (model) {
             try {
@@ -142,10 +127,6 @@ async function ssScraper(url, browser, categoryId) {
     }
 
     await page.close();
-}
-
-function findModel(listingData) {
-    
 }
 
 module.exports = ssScraper;

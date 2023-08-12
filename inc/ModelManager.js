@@ -9,9 +9,10 @@ class ModelManager {
 
     findId() {
         for (let entry of modelMap) {
-            if (
-                (entry.model.toLowerCase() === this.findModelName(this.listingTitle))
-                && entry.memory === this.memory) {
+            const modelName = this.findModelName(this.listingTitle) ? this.findModelName(this.listingTitle) : this.findModelName(this.listingDescription);
+            if ((entry.model.toLowerCase() === modelName)
+                && entry.memory === this.memory
+            ){
                 return entry.id;
             }
         }

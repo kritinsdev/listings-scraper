@@ -134,7 +134,6 @@ async function andeleScraper(url, browser) {
     if (!listingData.skip) {
         listingData.model_id = new ModelManager(listingData).findId();
 
-        console.log(listingData);
         if (listingData.model_id) {
             try {
                 await saveListing(listingData);

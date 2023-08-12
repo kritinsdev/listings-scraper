@@ -11,7 +11,7 @@ const sitesConfig = {
             paginator: '.paginator',
         },
         url: 'https://www.andelemandele.lv/perles/elektronika/telefoni/#order:created/brand:3232',
-        scrapeOnlyFirst: true,
+        scrapeOnlyFirst: false,
         scraper: andeleScraper,
     },
 
