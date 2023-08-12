@@ -86,7 +86,7 @@ async function ssScraper(url, browser) {
         listingObject.model_id = model;
         listingObject.memory = memory;
         listingObject.description = text;
-        listingObject.full_title = null;
+        listingObject.full_title = model;
 
         listingObject.added = new Date(added.getTime() - added.getTimezoneOffset() * 60000).toISOString();
 
@@ -112,7 +112,7 @@ async function ssScraper(url, browser) {
     if (!listingData.skip) {
         listingData.model_id = new ModelManager(listingData).findId();
 
-        if (model) {
+        if (listingData.model_id) {
             try {
                 await saveListing(listingData);
             } catch (error) {

@@ -2,7 +2,7 @@ const andeleScraper = require('./inc/sites/andeleScraper');
 const facebookScraper = require('./inc/sites/facebookScraper');
 const ssScraper = require('./inc/sites/ssScraper');
 
-const sites = ['andelemandele'];
+const sites = ['ss'];
 
 const sitesConfig = {
     andelemandele: {
@@ -11,7 +11,7 @@ const sitesConfig = {
             paginator: '.paginator',
         },
         url: 'https://www.andelemandele.lv/perles/elektronika/telefoni/#order:created/brand:3232',
-        scrapeOnlyFirst: false,
+        scrapeOnlyFirst: true,
         scraper: andeleScraper,
     },
 
@@ -25,15 +25,15 @@ const sitesConfig = {
         scraper: ssScraper,
     },
 
-    facebook: {
-        sitename: 'facebook',
-        selectors: {
-            paginator: null,
-        },
-        url:'https://www.facebook.com/marketplace/106273369404765/iphones',
-        scrapeOnlyFirst: false,
-        scraper: facebookScraper,
-    }
+    // facebook: {
+    //     sitename: 'facebook',
+    //     selectors: {
+    //         paginator: null,
+    //     },
+    //     url:'https://www.facebook.com/marketplace/106273369404765/iphones',
+    //     scrapeOnlyFirst: false,
+    //     scraper: facebookScraper,
+    // }
 };
 
 module.exports = {sites, sitesConfig};
