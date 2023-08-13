@@ -2,11 +2,11 @@ const cron = require('node-cron');
 const Scraper = require('./inc/Scraper');
 const {sitesConfig, sites} = require('./siteConfig');
 
-// cron.schedule('*/1 * * * *', () => {
-//     console.log('===================================================');
-//     console.log('Cron job started at', new Date().toLocaleString());
-//     start();
-// });
+cron.schedule('*/3 * * * *', () => {
+    console.log('===================================================');
+    console.log('Cron job started at', new Date().toLocaleString());
+    start();
+});
 
 async function start() {
     for(let i = 0; i < sites.length; i++) {
@@ -15,4 +15,4 @@ async function start() {
     }
 }
 
-start();
+// start();

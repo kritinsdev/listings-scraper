@@ -2,7 +2,7 @@ const ModelManager = require("./inc/ModelManager");
 
 const listing = {
     site: 'ss',
-    full_title : 'iphone 11 pro max',
+    full_title : 'Apple iPhone 13 pro max',
 }
 const MM = new ModelManager(listing);
 

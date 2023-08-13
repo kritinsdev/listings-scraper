@@ -1,6 +1,6 @@
 const andeleScraper = require('./inc/sites/andeleScraper');
-const facebookScraper = require('./inc/sites/facebookScraper');
 const ssScraper = require('./inc/sites/ssScraper');
+const facebookScraper = require('./inc/sites/facebookScraper');
 
 const sites = ['andelemandele','ss'];
 

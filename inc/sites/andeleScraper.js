@@ -141,7 +141,7 @@ async function andeleScraper(url, browser) {
                 console.error('Error while saving data to DB', error);
             }
         } else {
-            console.log(`===> MODEL NOT FOUND | TITLE: ${listingData.full_title} / URL: ${listingData.url}`)
+            console.log(`===> MODEL NOT FOUND | URL: ${listingData.url}`)
             await saveToBlacklist(listingData);
         }
     } else {
