@@ -60,8 +60,8 @@ async function ssScraper(url, browser) {
         let model = document.querySelector('#tdo_44');
 
         if(model) {
-            model = model.textContent.toLowerCase();
-            model = model.replace(/apple iphone /gi, "");
+            model = model.textContent.trim();
+            model = model.replace(/apple /gi, "");
         }
 
         //Date added 

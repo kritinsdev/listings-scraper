@@ -3,7 +3,7 @@ const { modelMap } = require("./modelMap");
 class ModelManager {
     constructor(modelData) {
         this.listingTitle = modelData.full_title;
-        this.memory = modelData.memory;
+        this.memory = (modelData.memory) ? modelData.memory : null;
         this.site = modelData.site;
     }
 
@@ -25,67 +25,47 @@ class ModelManager {
     findModelName(string) {
         const models = [
             '7',
-            '7 Plus',
+            '7 plus',
             '7+',
             '8',
-            '8 Plus',
+            '8 plus',
             '8+',
             'X',
-            'XR',
-            'XS',
-            'XS Max',
+            'xr',
+            'xs',
+            'xs max',
             '11',
-            '11 Pro',
-            '11 Pro Max',
+            '11 pro',
+            '11 pro max',
             '12',
-            '12 Mini',
-            '12 Pro',
-            '12 Pro Max',
+            '12 mini',
+            '12 pro',
+            '12 pro max',
             '13',
-            '13 Mini',
-            '13 Pro',
-            '13 Pro Max',
-            'SE 2nd Gen',
-            'SE 3rd Gen',
-            'SE3',
-            'SE 3',
+            '13 mini',
+            '13 pro',
+            '13 pro max',
+            'se 2nd gen',
+            'se 3rd gen',
+            'se3',
+            'se 3',
             '14',
-            '14 Plus',
-            '14 Pro',
-            '14 Pro Max',
+            '14 plus',
+            '14 pro',
+            '14 pro max',
         ];
-    
         models.sort((a, b) => b.length - a.length);
-    
-        if(this.site === 'andelemandele') {
-            for (const model of models) {
-                const patternParts = model.split(' ').map(part => part.replace(/(\d+)/, '\\s*$1\\s*'));
-                const patternString = patternParts.join('\\s*');
-                const pattern = new RegExp(patternString, 'i');
         
-                if (pattern.test(string)) {
-                    return `iPhone ${model}`;
-                }
-            }
-        }
-
-        if(this.site === 'ss') {
-            const normalizedString = this.normalizeModel(string);
-
-            for (const model of models) {
-                const normalizedModel = this.normalizeModel(model);
-                if (normalizedModel === normalizedString) {
-                  return `iPhone ${model}`;
-                }
-              }
-        }   
-
-        return null;
+        const formattedText = string.toLowerCase();
+        const regex = new RegExp(
+            `(${models.join('|').replace(/\s+/g, '\\s')})(?![0-9])`,
+            'gi'
+            );
+        const match = formattedText.match(regex);
+        return match ? `iPhone ${match[0]}` : null;
+        
     }
 
-    normalizeModel(model) {
-        return model.toLowerCase().replace(' ', '').replace('+', 'plus');
-    }
 }
 
 module.exports = ModelManager;

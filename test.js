@@ -1,14 +1,12 @@
 const ModelManager = require("./inc/ModelManager");
 
 const listing = {
-    site: 'andelemandele',
-    full_title : 'Iphone12 promax',
-    description : `Pārdodu telefonu, jo pašai iegādāts jauns. Pārdodu kastītē, bet bez uzlādes vada, vizuāli nekādu defektu nav - vienmēr lietots vāciņā un ar aizsargstikliņu. Baterijas veselība 84%, jālādē bieži.`
+    site: 'ss',
+    full_title : 'iphone 11 pro max',
 }
 const MM = new ModelManager(listing);
 
-console.log(MM.findId()); //null
-
+console.log(MM.findId()); 
 
 // function findModelName(string) {
 //     const models = [
