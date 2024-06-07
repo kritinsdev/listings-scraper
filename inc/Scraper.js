@@ -33,7 +33,14 @@ class Scraper {
 
         await page.goto(this.pageUrl);
 
-        await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
+        if(this.currentSite === 'facebook') {
+            this.scrapedListingUrls = ['https://www.facebook.com/marketplace/item/621827286780032/?ref=category_feed&referral_code=null&referral_story_type=post']
+            await this.loginFacebook(page);
+
+            // await this.collectFbUrls(page)
+        } else {
+            await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
+        }
 
         let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
 
@@ -44,7 +51,7 @@ class Scraper {
         }
 
         for (const url of newLinks) {
-
+            console.log(url);
             const delay = getRandomTimeout(2, 4);
 
             await this.siteConfig.scraper(url, browser);
@@ -73,6 +80,10 @@ class Scraper {
             default:
                 break;
         }
+    }
+
+    async collectFbUrls() {
+        
     }
 
     async collectUrls(page, totalPages, firstPage) {

@@ -16,9 +16,11 @@ async function andeleScraper(url, browser) {
     const listingData = await page.evaluate((args) => {
         const listingObject = {};
 
-        const unavailable = document.querySelector('.block-404__logo');
+        const unavailable = document.querySelector('.page--404');
         if (unavailable) {
             listingObject.skip = true;
+            listingObject.url = args.url;
+            listingObject.site = 'andelemandele';
             listingObject.skipReason = 'Listing is sold or removed';
             return listingObject;
         }
@@ -133,7 +135,6 @@ async function andeleScraper(url, browser) {
 
     if (!listingData.skip) {
         listingData.model_id = new ModelManager(listingData).findId();
-
         if (listingData.model_id) {
             try {
                 await saveListing(listingData);
