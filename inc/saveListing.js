@@ -1,5 +1,50 @@
 const axios = require('axios');
-require('dotenv').config()
+require('dotenv').config();
+
+async function sendToDiscord(listingData) {
+  const payload = {
+    embeds: [
+      {
+        description: listingData.description,
+        color: 5814783,
+        fields: [
+          {
+            name: 'Model',
+            value: listingData.modelName,
+            inline: true
+          },
+          {
+            name: 'Target Price',
+            value: `${listingData.targetPrice}€`,
+            inline: true
+          },
+          {
+            name: 'Actual Price',
+            value: `${listingData.price}€`,
+            inline: true
+          },
+          {
+            name: 'Memory',
+            value: listingData.memory ? listingData.memory : '-',
+            inline: false
+          },
+          {
+            name: 'URL',
+            value: listingData.url,
+            inline: false
+          }
+        ],
+      }
+    ]
+  };
+
+  try {
+    const response = await axios.post(process.env.WEBHOOK, payload);
+    console.log('Message sent: ', response.data);
+  } catch (error) {
+    console.error('Error sending message: ', error);
+  }
+}
 
 async function saveListing(listingData) {
   const apiUrl = `${process.env.API_URL}/listings`;
@@ -37,7 +82,7 @@ async function saveToBlacklist(data) {
 async function createListingDetails(data) {
   const apiUrl = `${process.env.API_URL}/details`;
   try {
-    const response = await axios.post(apiUrl, {listing_id : data.id, ...data}, {
+    const response = await axios.post(apiUrl, { listing_id: data.id, ...data }, {
       headers: {
         'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
         'Content-Type': 'application/json'
@@ -48,4 +93,4 @@ async function createListingDetails(data) {
   }
 }
 
-module.exports = { saveListing, saveToBlacklist };
+module.exports = { sendToDiscord };

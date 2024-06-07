@@ -21,13 +21,13 @@ class Scraper {
             headless: "new",
         });
 
-        let blacklistUrls = await getBlacklistUrls(this.currentSite);
-        blacklistUrls = blacklistUrls.map(obj => obj.url);
+        // let blacklistUrls = await getBlacklistUrls(this.currentSite);
+        // blacklistUrls = blacklistUrls.map(obj => obj.url);
 
-        let existingListingUrls = await getExistingUrls(this.currentSite);
-        this.existingListingUrls = existingListingUrls.map(obj => obj.url);
+        // let existingListingUrls = await getExistingUrls(this.currentSite);
+        // this.existingListingUrls = existingListingUrls.map(obj => obj.url);
 
-        let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
+        // let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
 
         const page = await browser.newPage();
 
@@ -42,7 +42,8 @@ class Scraper {
             await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
         }
 
-        let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
+        // let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
+        let newLinks = this.scrapedListingUrls;
 
         if (newLinks.length > 0) {
             console.log(`${newLinks.length} new listings. Scraping...`)
@@ -80,10 +81,6 @@ class Scraper {
             default:
                 break;
         }
-    }
-
-    async collectFbUrls() {
-        
     }
 
     async collectUrls(page, totalPages, firstPage) {

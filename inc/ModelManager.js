@@ -2,26 +2,31 @@ const { modelMap } = require("./modelMap");
 
 class ModelManager {
     constructor(modelData) {
-        this.listingTitle = modelData.full_title;
+        this.listingTitle = modelData.fullTitle;
         this.memory = (modelData.memory) ? modelData.memory : null;
-        this.site = modelData.site;
     }
 
-    findId() {
+    findModel() {
         const modelName = this.findModelName(this.listingTitle);
         if (!modelName) {
-            return null;
+            return {};
         }
-    
-        for (let entry of modelMap) {
-            if (entry.model.toLowerCase() === modelName.toLowerCase() && entry.memory === this.memory) {
-                return entry.id;
+
+        for (let model of modelMap) {
+            if (model.model.toLowerCase() === modelName.toLowerCase() && model.memory === this.memory) {
+                const details = {
+                    modelId: model.id,
+                    targetPrice: model.price,
+                    modelName: model.model,
+                }
+
+                return details;
             }
         }
-    
-        return null;
+
+        return {};
     }
-    
+
     findModelName(string) {
         const models = [
             '7',
@@ -30,7 +35,7 @@ class ModelManager {
             '8',
             '8 plus',
             '8+',
-            'X',
+            'x',
             'xr',
             'xs',
             'xs max',
@@ -49,23 +54,18 @@ class ModelManager {
             'se 3rd gen',
             'se3',
             'se 3',
-            '14',
-            '14 plus',
-            '14 pro',
-            '14 pro max',
         ];
+
         models.sort((a, b) => b.length - a.length);
-        
+
         const formattedText = string.toLowerCase();
         const regex = new RegExp(
             `(${models.join('|').replace(/\s+/g, '\\s')})(?![0-9])`,
             'gi'
-            );
+        );
         const match = formattedText.match(regex);
         return match ? `iPhone ${match[0]}` : null;
-        
     }
-
 }
 
 module.exports = ModelManager;

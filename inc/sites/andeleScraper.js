@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const { saveListing, saveToBlacklist } = require('../saveListing');
+const { sendToDiscord } = require('../saveListing');
 const ModelManager = require('../ModelManager');
 puppeteer.use(StealthPlugin());
 
@@ -16,11 +16,10 @@ async function andeleScraper(url, browser) {
     const listingData = await page.evaluate((args) => {
         const listingObject = {};
 
-        const unavailable = document.querySelector('.page--404');
+        const unavailable = document.querySelector('.block-404');
         if (unavailable) {
             listingObject.skip = true;
             listingObject.url = args.url;
-            listingObject.site = 'andelemandele';
             listingObject.skipReason = 'Listing is sold or removed';
             return listingObject;
         }
@@ -83,50 +82,52 @@ async function andeleScraper(url, browser) {
         
             return null;
         }
-        
-
-        // Price
-        const price = document.querySelector('.product__price');
+    
+        const price = document.querySelector('.product-node__price');
         const oldPrice = price.querySelector('s');
         if (oldPrice) {
             oldPrice.remove();
         }
         const formattedPrice = price.textContent.replace(/[^0-9.]+/g, '');
 
-        // Description
-        const description = document.querySelector('.product__descr').textContent.trim();
+        const description = (document.querySelector('.product-node__descr')) ? document.querySelector('.product-node__descr').textContent.trim() : null;
         const formattedDescription = (description) ? description.replace(/[\n+]/g, ' ') : null;
 
-        // Title
-        let title = document.querySelector('.product__title');
+        let title = document.querySelector('.product-node__title');
         const spanElements = title.querySelectorAll('span');
         spanElements.forEach(spanElement => {
             spanElement.remove();
         });
         title = title.textContent.replace(/\t|\n/g, '');
 
-        listingObject.site = 'andelemandele';
-        listingObject.model_id = null;
+        listingObject.modelId = null;
         listingObject.url = args.url;
-        listingObject.full_title = title;
+        listingObject.fullTitle = title;
         listingObject.description = formattedDescription;
         listingObject.memory = findMemory(title) ? findMemory(title) : findMemory(formattedDescription);
         listingObject.price = parseFloat(formattedPrice);
 
-        const dataRows = document.querySelectorAll('.attribute-list > tbody > tr');
+        const dataRows = document.querySelectorAll('.product-attribute-list > tbody > tr');
         for (let i = 0; i < dataRows.length; i++) {
-            const propName = dataRows[i].querySelector('td:first-child');
-            const propValue = dataRows[i].querySelector('td:last-child');
+            const propName = dataRows[i].querySelector('.product-attribute-list__key').textContent.toLowerCase().trim();
+            const propValue = dataRows[i].querySelector('.product-attribute-list__value').textContent.toLowerCase().trim();
 
-            if (propName.textContent == 'Pievienots') {
-                const date = parseDate(propValue.textContent.trim());
-                listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+            if (propName) {
+                if(propName == 'pievienots') {
+                    const date = parseDate(propValue);
+                    listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+                }
+
+                if(propName == 'tehnikas veids' && propValue == 'vāciņš') {
+                    listingObject.skip = true;
+                    return listingObject;
+                }
             }
         }
 
-        if (listingObject.price < 50) {
+        if (listingObject.price < 20) {
             listingObject.skip = true;
-            listingObject.skipReason = `Price is less than 50 euros / URL: ${args.url}`;
+            listingObject.skipReason = `Price is less than 20 euros / URL: ${args.url}`;
             return listingObject;
         }
 
@@ -134,19 +135,21 @@ async function andeleScraper(url, browser) {
     }, args);
 
     if (!listingData.skip) {
-        listingData.model_id = new ModelManager(listingData).findId();
-        if (listingData.model_id) {
+        const modelData = new ModelManager(listingData).findModel();
+
+        listingData.modelId = modelData.modelId;
+        listingData.targetPrice = modelData.targetPrice;
+        listingData.modelName = modelData.modelName;
+
+        if (listingData.modelId && (Math.abs(listingData.price - listingData.targetPrice) <= 40)) {
             try {
-                await saveListing(listingData);
+                await sendToDiscord(listingData);
             } catch (error) {
-                console.error('Error while saving data to DB', error);
+                console.error('Error', error);
             }
-        } else {
-            console.log(`===> MODEL NOT FOUND | URL: ${listingData.url}`)
-            await saveToBlacklist(listingData);
+        } else if (!listingData.modelId) {
+            console.log(`MODEL NOT FOUND | URL: ${listingData.url}`)
         }
-    } else {
-        await saveToBlacklist(listingData);
     }
 
     await page.close();
