@@ -25,7 +25,7 @@ class Scraper {
             args: [
               "--disable-setuid-sandbox",
               "--no-sandbox",
-            //   "--single-process",
+              "--single-process",
               "--no-zygote",
             ],
             executablePath:
@@ -60,9 +60,10 @@ class Scraper {
             await sleep(delay);
         }
 
+        await browser.close();
+        await this.closeDB();
         console.log('Scraping finished');
         console.log('=============================');
-        await browser.close();
     }
 
     async getTotalPages(page) {
@@ -101,6 +102,7 @@ class Scraper {
                     }
                 }
                 break;
+
             case 'ss':
                 for (let i = 1; i <= totalPages; i++) {
                     const delay = getRandomTimeout(1, 2);
@@ -123,6 +125,15 @@ class Scraper {
             console.log('Connected to MongoDB');
         } catch (error) {
             console.error('Error connecting to MongoDB:', error);
+        }
+    }
+
+    async closeDB() {
+        try {
+            await mongoose.connection.close();
+            console.log('Closed MongoDB connection');
+        } catch (error) {
+            console.error('Error closing MongoDB connection:', error);
         }
     }
 
