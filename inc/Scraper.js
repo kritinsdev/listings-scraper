@@ -26,11 +26,12 @@ class Scraper {
                 // "--single-process",
                 "--no-zygote",
             ],
-            timeout: 120000,
+            timeout: 0,
+            waitUntil: "domcontentloaded",
             executablePath: process.env.NODE_ENV === 'production' ?
             process.env.PUPPETEER_EXECUTABLE_PATH :
             puppeteer.executablePath(),
-            headless: "new",
+            headless: false,
         });
 
         const page = await browser.newPage();
@@ -41,6 +42,8 @@ class Scraper {
 
         let newLinks = this.scrapedListingUrls.filter(url => !this.existingListingUrls.includes(url));
 
+        console.log('=============================');
+        console.log(`Scraping ${this.currentSite}`);
         if (newLinks.length > 0) {
             console.log(`${newLinks.length} new listings. Scraping...`)
         } else {
@@ -57,6 +60,7 @@ class Scraper {
 
         this.updateUrlsFile();
         console.log('Scraping finished');
+        console.log('=============================');
         await browser.close();
     }
 
@@ -134,8 +138,6 @@ class Scraper {
 
     loadExistingUrls() {
         const filePath = path.join(__dirname, '..', `${this.currentSite}-urls.json`);
-
-        console.log(filePath);
         try {
             const data = fs.readFileSync(filePath, 'utf8');
             this.existingListingUrls = JSON.parse(data);
