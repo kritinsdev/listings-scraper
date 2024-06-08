@@ -3,12 +3,16 @@ const Scraper = require('./inc/Scraper');
 const {sitesConfig, sites} = require('./siteConfig');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const port = process.env.PORT || 4000;
+
+app.get('/', (req, res) => {
+    res.send('Listings app');
+  })
 
 app.get('/scrape23hashed', async (req, res) => {
     try {
         await start();
-        res.status(200).send('Scraping started.');
+        res.status(200).send('Scraping started');
     } catch (error) {
         console.error('Error during scraping:', error);
         res.status(500).send('An error occurred while scraping.');
@@ -22,6 +26,6 @@ async function start() {
     }
 }
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server is running on ${port}`);
 });
