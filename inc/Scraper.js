@@ -1,3 +1,4 @@
+const fs = require('fs');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { getRandomTimeout, sleep, getExistingUrls, getBlacklistUrls } = require('./helpers');
@@ -33,14 +34,7 @@ class Scraper {
 
         await page.goto(this.pageUrl);
 
-        if(this.currentSite === 'facebook') {
-            this.scrapedListingUrls = ['https://www.facebook.com/marketplace/item/621827286780032/?ref=category_feed&referral_code=null&referral_story_type=post']
-            await this.loginFacebook(page);
-
-            // await this.collectFbUrls(page)
-        } else {
-            await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
-        }
+        await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
 
         // let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
         let newLinks = this.scrapedListingUrls;
@@ -52,7 +46,6 @@ class Scraper {
         }
 
         for (const url of newLinks) {
-            console.log(url);
             const delay = getRandomTimeout(2, 4);
 
             await this.siteConfig.scraper(url, browser);
@@ -99,6 +92,14 @@ class Scraper {
                         console.log(error);
                     }
                 }
+
+                const jsonUrls = JSON.stringify(this.scrapedListingUrls, null, 2);
+                try {
+                    fs.writeFileSync('urls.json', jsonUrls, 'utf8');
+                } catch (err) {
+                    console.log(err);
+                }
+
                 break;
 
             case 'ss':

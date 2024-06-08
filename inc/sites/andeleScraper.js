@@ -42,12 +42,12 @@ async function andeleScraper(url, browser) {
         function parseDate(dateString) {
             const today = new Date();
 
-            if (dateString.startsWith('Šodien')) {
+            if (dateString.startsWith('šodien')) {
                 const time = dateString.split(',')[1].trim().split(':');
                 return new Date(today.getFullYear(), today.getMonth(), today.getDate(), +time[0], +time[1]);
             }
 
-            if (dateString.startsWith('Vakar')) {
+            if (dateString.startsWith('vakar')) {
                 const time = dateString.split(',')[1].trim().split(':');
                 return new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1, +time[0], +time[1]);
             }
@@ -118,7 +118,7 @@ async function andeleScraper(url, browser) {
                     listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
                 }
 
-                if(propName == 'tehnikas veids' && propValue == 'vāciņš') {
+                if(propName == 'tehnikas veids' && (propValue == 'vāciņš' || propValue == 'lādētāji')) {
                     listingObject.skip = true;
                     return listingObject;
                 }

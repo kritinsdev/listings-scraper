@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { saveListing, saveToBlacklist } = require('../saveListing');
-const { models, modelIds } = require('../helpers')
+const { models } = require('../helpers')
 puppeteer.use(StealthPlugin());
 
 async function facebookScraper(url, browser) {

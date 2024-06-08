@@ -1,7 +1,6 @@
 const cron = require('node-cron');
 const Scraper = require('./inc/Scraper');
 const {sitesConfig, sites} = require('./siteConfig');
-const axios = require('axios');
 
 // cron.schedule('*/30 * * * *', () => {
 //     console.log('===================================================');
