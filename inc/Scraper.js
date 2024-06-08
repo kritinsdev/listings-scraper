@@ -31,7 +31,7 @@ class Scraper {
             executablePath: process.env.NODE_ENV === 'production' ?
             process.env.PUPPETEER_EXECUTABLE_PATH :
             puppeteer.executablePath(),
-            headless: false,
+            headless: true,
         });
 
         const page = await browser.newPage();

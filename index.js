@@ -27,5 +27,6 @@ async function start() {
 }
 
 app.listen(port, () => {
+    console.log(process.env.NODE_ENV);
     console.log(`Server is running on ${port}`);
 });
