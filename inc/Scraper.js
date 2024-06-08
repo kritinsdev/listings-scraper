@@ -18,6 +18,7 @@ class Scraper {
     }
 
     async scrape() {
+        console.log('=============================');
         await this.connectDB();
         await this.fetchExistingUrls();
 
@@ -36,13 +37,15 @@ class Scraper {
 
         const page = await browser.newPage();
 
-        await page.goto(this.pageUrl);
+        await page.goto(this.pageUrl,{
+            waitUntil: 'load',
+            timeout: 0
+        });
 
         await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
 
         let newLinks = this.scrapedListingUrls.filter(url => !this.existingListingUrls.includes(url));
-
-        console.log('=============================');
+        
         console.log(`Scraping ${this.currentSite}`);
         if (newLinks.length > 0) {
             console.log(`${newLinks.length} new listings. Scraping...`)

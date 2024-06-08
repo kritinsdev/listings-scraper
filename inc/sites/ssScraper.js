@@ -7,8 +7,11 @@ puppeteer.use(StealthPlugin());
 async function ssScraper(url, browser) {
     const page = await browser.newPage();
 
-    await page.goto(url);
-    
+    await page.goto(url, {
+        waitUntil: 'load',
+        timeout: 0
+    });
+
     const args = {
         url: url,
     }
@@ -16,17 +19,17 @@ async function ssScraper(url, browser) {
     const listingData = await page.evaluate((args) => {
         function parseDateString(dateString) {
             const cleanedDateString = dateString.replace('Datums: ', '');
-        
+
             const [datePart, timePart] = cleanedDateString.split(' ');
-        
+
             const [day, month, year] = datePart.split('.');
-        
+
             const [hours, minutes] = timePart.split(':');
-        
+
             const isoString = `${year}-${month}-${day}T${hours}:${minutes}`;
-        
+
             const date = new Date(isoString);
-        
+
             return date;
         }
 
@@ -36,21 +39,21 @@ async function ssScraper(url, browser) {
         // Price
         let price = document.querySelector('.ads_price');
 
-        if(price) {
+        if (price) {
             price = price.textContent.replace(/\D/g, '');
             price = parseFloat(price);
         }
 
         //Memory
         let memory = document.querySelector('#tdo_42');
-        if(memory) {
+        if (memory) {
             memory = memory.textContent;
             memory = parseInt(memory);
         }
 
         // Description
         let description = document.querySelector('#msg_div_msg');
-        if(description) {
+        if (description) {
             description = description.textContent.replace(/[\n+]/g, ' ').trim().toLowerCase();
         }
 
@@ -59,14 +62,14 @@ async function ssScraper(url, browser) {
         //Model 
         let model = document.querySelector('#tdo_44');
 
-        if(model) {
+        if (model) {
             model = model.textContent.trim();
             model = model.replace(/apple /gi, "");
         }
 
         //Date added 
         let added = document.querySelector('#page_main > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td:nth-child(2)');
-        if(added) {
+        if (added) {
             added = added.textContent.trim();
             added = parseDateString(added);
         }
@@ -74,7 +77,7 @@ async function ssScraper(url, browser) {
         let element = document.querySelector('#msg_div_msg');
 
         let tables = element.getElementsByTagName('table');
-        while(tables[0]) {
+        while (tables[0]) {
             tables[0].parentNode.removeChild(tables[0]);
         }
         let text = element.innerText;
@@ -90,17 +93,17 @@ async function ssScraper(url, browser) {
 
         listingObject.added = new Date(added.getTime() - added.getTimezoneOffset() * 60000).toISOString();
 
-        if(listingObject.price < 25) {
+        if (listingObject.price < 25) {
             listingObject.skip = true;
             listingObject.skipReason = `Price is less than 25 euros / URL: ${args.url}`;
         }
 
-        if(!listingObject.model_id) {
+        if (!listingObject.model_id) {
             listingObject.skip = true;
             listingObject.skipReason = `Could not find model / URL: ${args.url}`;
         }
 
-        if(isBlacklisted) {
+        if (isBlacklisted) {
             listingObject.skip = true;
             listingObject.skipReason = `Contains blacklisted word / URL: ${args.url}`;
         }
