@@ -2,6 +2,7 @@ const fs = require('fs');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { getRandomTimeout, sleep, getExistingUrls, getBlacklistUrls } = require('./helpers');
+const { executablePath } = require('puppeteer');
 puppeteer.use(StealthPlugin());
 
 class Scraper {
@@ -18,6 +19,15 @@ class Scraper {
 
     async scrape() {
         const browser = await puppeteer.launch({
+            args: [
+                "--disable-setuid-sandbox",
+                "--no-sandbox",
+                "--single-process",
+                "--no-zygote",
+            ],
+            executablePath: process.env.NODE_ENV === 'production' ?
+            process.env.PUPPETEER_EXECUTABLE_PATH :
+            puppeteer.executablePath(),
             headless: "new",
         });
 
