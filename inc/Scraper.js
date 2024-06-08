@@ -1,9 +1,9 @@
 require('dotenv').config();
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
+const Url = require('./urlModel');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const { getRandomTimeout, sleep, getExistingUrls, getBlacklistUrls } = require('./helpers');
+const { getRandomTimeout, sleep } = require('./helpers');
 const { executablePath } = require('puppeteer');
 puppeteer.use(StealthPlugin());
 
@@ -15,11 +15,12 @@ class Scraper {
         this.scrapeOnlyFirstPage = this.siteConfig['scrapeOnlyFirst'];
         this.scrapedListingUrls = [];
         this.existingListingUrls = [];
-
-        this.loadExistingUrls();
     }
 
     async scrape() {
+        await this.connectDB();
+        await this.fetchExistingUrls();
+
         const browser = await puppeteer.launch({
             args: [
               "--disable-setuid-sandbox",
@@ -54,10 +55,11 @@ class Scraper {
 
             await this.siteConfig.scraper(url, browser);
 
+            await this.saveUrl(url);
+
             await sleep(delay);
         }
 
-        this.updateUrlsFile();
         console.log('Scraping finished');
         console.log('=============================');
         await browser.close();
@@ -98,16 +100,7 @@ class Scraper {
                         console.log(error);
                     }
                 }
-
-                const jsonUrls = JSON.stringify(this.scrapedListingUrls, null, 2);
-                try {
-                    fs.writeFileSync(`${this.currentSite}-urls.json`, jsonUrls, 'utf8');
-                } catch (err) {
-                    console.log(err);
-                }
-
                 break;
-
             case 'ss':
                 for (let i = 1; i <= totalPages; i++) {
                     const delay = getRandomTimeout(1, 2);
@@ -124,25 +117,31 @@ class Scraper {
         }
     }
 
-    updateUrlsFile() {
-        const filePath = path.join(__dirname, '..', `${this.currentSite}-urls.json`);
-        const allUrls = [...new Set([...this.existingListingUrls, ...this.scrapedListingUrls])];
-        const jsonUrls = JSON.stringify(allUrls, null, 2);
+    async connectDB() {
         try {
-            fs.writeFileSync(filePath, jsonUrls, 'utf8');
-        } catch (err) {
-            console.log('Error writing to URLs file:', err);
+            await mongoose.connect(process.env.MONGO_URI);
+            console.log('Connected to MongoDB');
+        } catch (error) {
+            console.error('Error connecting to MongoDB:', error);
         }
     }
 
-    loadExistingUrls() {
-        const filePath = path.join(__dirname, '..', `${this.currentSite}-urls.json`);
+    async saveUrl(url) {
         try {
-            const data = fs.readFileSync(filePath, 'utf8');
-            this.existingListingUrls = JSON.parse(data);
+            const newUrl = new Url({ url });
+            await newUrl.save();
+            console.log(`Saved URL: ${url}`);
         } catch (error) {
-            console.log('No existing URLs file found or error reading file.');
-            this.existingListingUrls = [];
+            console.error(`Error saving URL: ${url}`, error);
+        }
+    }
+
+    async fetchExistingUrls() {
+        try {
+            const urls = await Url.find({}, 'url').lean();
+            this.existingListingUrls = urls.map(urlObj => urlObj.url);
+        } catch (error) {
+            console.error('Error fetching existing URLs:', error);
         }
     }
 }
