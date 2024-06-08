@@ -44,6 +44,7 @@ class Scraper {
         }
 
         this.updateUrlsFile();
+        console.log('Scraping finished');
         await browser.close();
     }
 

@@ -83,16 +83,16 @@ async function ssScraper(url, browser) {
         listingObject.site = 'ss';
         listingObject.url = args.url;
         listingObject.price = price;
-        listingObject.model_id = model;
+        listingObject.modelId = null;
         listingObject.memory = memory;
         listingObject.description = text;
-        listingObject.full_title = model;
+        listingObject.fullTitle = model;
 
         listingObject.added = new Date(added.getTime() - added.getTimezoneOffset() * 60000).toISOString();
 
-        if(listingObject.price < 50) {
+        if(listingObject.price < 25) {
             listingObject.skip = true;
-            listingObject.skipReason = `Price is less than 50 euros / URL: ${args.url}`;
+            listingObject.skipReason = `Price is less than 25 euros / URL: ${args.url}`;
         }
 
         if(!listingObject.model_id) {
@@ -110,21 +110,24 @@ async function ssScraper(url, browser) {
     }, args);
 
     if (!listingData.skip) {
-        listingData.model_id = new ModelManager(listingData).findId();
+        const modelData = new ModelManager(listingData).findModel();
 
-        if (listingData.model_id) {
+        listingData.modelId = modelData.modelId;
+        listingData.targetPrice = modelData.targetPrice;
+        listingData.modelName = modelData.modelName;
+
+        if (
+            listingData.modelId &&
+            (Math.abs(listingData.price - listingData.targetPrice) <= 40)
+        ) {
             try {
-                await saveListing(listingData);
+                await sendToDiscord(listingData);
             } catch (error) {
-                console.error('Error while saving data to DB', error);
+                console.error('Error', error);
             }
-        } else {
-            console.log(`===> MODEL NOT FOUND | URL: ${listingData.url}`)
-            await saveToBlacklist(listingData);
+        } else if (!listingData.modelId) {
+            console.log(`MODEL NOT FOUND | URL: ${listingData.url}`)
         }
-
-    } else {
-        await saveToBlacklist(listingData);
     }
 
     await page.close();

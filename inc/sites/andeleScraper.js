@@ -126,9 +126,9 @@ async function andeleScraper(url, browser) {
             }
         }
 
-        if (listingObject.price < 20) {
+        if (listingObject.price < 25) {
             listingObject.skip = true;
-            listingObject.skipReason = `Price is less than 20 euros / URL: ${args.url}`;
+            listingObject.skipReason = `Price is less than 25 euros / URL: ${args.url}`;
             return listingObject;
         }
 

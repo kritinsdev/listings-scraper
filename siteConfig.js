@@ -2,9 +2,7 @@ const andeleScraper = require('./inc/sites/andeleScraper');
 const ssScraper = require('./inc/sites/ssScraper');
 const facebookScraper = require('./inc/sites/facebookScraper');
 
-const sites = ['andelemandele'];
-// const sites = ['ss'];
-// const sites = ['facebook'];
+const sites = ['andelemandele', 'ss'];
 
 const sitesConfig = {
     andelemandele: {
@@ -23,7 +21,7 @@ const sitesConfig = {
             paginator: '.td2',
         },
         url: 'https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/',
-        scrapeOnlyFirst: false,
+        scrapeOnlyFirst: true,
         scraper: ssScraper,
     },
 
