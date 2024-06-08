@@ -1,7 +1,8 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const { sendToDiscord } = require('../saveListing');
 const ModelManager = require('../ModelManager');
+const { sendToDiscord } = require('../saveListing');
+
 puppeteer.use(StealthPlugin());
 
 async function andeleScraper(url, browser) {
@@ -141,7 +142,10 @@ async function andeleScraper(url, browser) {
         listingData.targetPrice = modelData.targetPrice;
         listingData.modelName = modelData.modelName;
 
-        if (listingData.modelId && (Math.abs(listingData.price - listingData.targetPrice) <= 40)) {
+        if (
+            listingData.modelId &&
+            (Math.abs(listingData.price - listingData.targetPrice) <= 40)
+        ) {
             try {
                 await sendToDiscord(listingData);
             } catch (error) {

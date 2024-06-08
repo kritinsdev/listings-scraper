@@ -7,14 +7,13 @@ puppeteer.use(StealthPlugin());
 class Scraper {
     constructor(config) {
         this.siteConfig = config;
-        this.scrapedListingUrls = [];
         this.currentSite = this.siteConfig.sitename;
         this.pageUrl = this.siteConfig.url;
         this.scrapeOnlyFirstPage = this.siteConfig['scrapeOnlyFirst'];
-        this.existingListingsFullUrls = null;
+        this.scrapedListingUrls = [];
         this.existingListingUrls = [];
 
-        console.log(`Starting scraping on: ${this.currentSite}`);
+        this.loadExistingUrls();
     }
 
     async scrape() {
@@ -22,22 +21,13 @@ class Scraper {
             headless: "new",
         });
 
-        // let blacklistUrls = await getBlacklistUrls(this.currentSite);
-        // blacklistUrls = blacklistUrls.map(obj => obj.url);
-
-        // let existingListingUrls = await getExistingUrls(this.currentSite);
-        // this.existingListingUrls = existingListingUrls.map(obj => obj.url);
-
-        // let existingUrlsSet = new Set([...this.existingListingUrls, ...blacklistUrls]);
-
         const page = await browser.newPage();
 
         await page.goto(this.pageUrl);
 
         await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
 
-        // let newLinks = this.scrapedListingUrls.filter(url => !existingUrlsSet.has(url));
-        let newLinks = this.scrapedListingUrls;
+        let newLinks = this.scrapedListingUrls.filter(url => !this.existingListingUrls.includes(url));
 
         if (newLinks.length > 0) {
             console.log(`${newLinks.length} new listings. Scraping...`)
@@ -52,9 +42,9 @@ class Scraper {
 
             await sleep(delay);
         }
-        console.log('Finished scraping.')
-        await browser.close();
 
+        this.updateUrlsFile();
+        await browser.close();
     }
 
     async getTotalPages(page) {
@@ -95,7 +85,7 @@ class Scraper {
 
                 const jsonUrls = JSON.stringify(this.scrapedListingUrls, null, 2);
                 try {
-                    fs.writeFileSync('urls.json', jsonUrls, 'utf8');
+                    fs.writeFileSync(`${this.currentSite}-urls.json`, jsonUrls, 'utf8');
                 } catch (err) {
                     console.log(err);
                 }
@@ -118,30 +108,24 @@ class Scraper {
         }
     }
 
-    async loginFacebook(page) {
-        let delay = getRandomTimeout(1, 3);
-        await page.goto('https://www.facebook.com/');
-        await sleep(delay);
+    updateUrlsFile() {
+        const allUrls = [...new Set([...this.existingListingUrls, ...this.scrapedListingUrls])];
+        const jsonUrls = JSON.stringify(allUrls, null, 2);
+        try {
+            fs.writeFileSync(`${this.currentSite}-urls.json`, jsonUrls, 'utf8');
+        } catch (err) {
+            console.log('Error writing to URLs file:', err);
+        }
+    }
 
-        delay = getRandomTimeout(1, 3);
-        await Promise.all([
-            page.click('[data-cookiebanner="accept_button"]'),
-        ]);
-        await sleep(delay);
-
-        delay = getRandomTimeout(1, 3);
-        await page.type('[data-testid="royal_email"]', process.env.FB_USERNAME);
-        await sleep(delay);
-
-        delay = getRandomTimeout(1, 3);
-        await page.type('[data-testid="royal_pass"]', process.env.FB_PASSWORD);
-        await sleep(delay);
-
-        delay = getRandomTimeout(1, 3);
-        await Promise.all([
-            page.click('[data-testid="royal_login_button"]'),
-        ]);
-        await sleep(delay);
+    loadExistingUrls() {
+        try {
+            const data = fs.readFileSync(`${this.currentSite}-urls.json`, 'utf8');
+            this.existingListingUrls = JSON.parse(data);
+        } catch (error) {
+            console.log('No existing URLs file found or error reading file.');
+            this.existingListingUrls = [];
+        }
     }
 }
 

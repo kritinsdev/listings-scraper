@@ -50,6 +50,32 @@ async function facebookScraper(url, browser) {
     } else {
         // await saveToBlacklist(listingData);
     }
+
+    // async loginFacebook(page) {
+    //     let delay = getRandomTimeout(1, 3);
+    //     await page.goto('https://www.facebook.com/');
+    //     await sleep(delay);
+
+    //     delay = getRandomTimeout(1, 3);
+    //     await Promise.all([
+    //         page.click('[data-cookiebanner="accept_button"]'),
+    //     ]);
+    //     await sleep(delay);
+
+    //     delay = getRandomTimeout(1, 3);
+    //     await page.type('[data-testid="royal_email"]', process.env.FB_USERNAME);
+    //     await sleep(delay);
+
+    //     delay = getRandomTimeout(1, 3);
+    //     await page.type('[data-testid="royal_pass"]', process.env.FB_PASSWORD);
+    //     await sleep(delay);
+
+    //     delay = getRandomTimeout(1, 3);
+    //     await Promise.all([
+    //         page.click('[data-testid="royal_login_button"]'),
+    //     ]);
+    //     await sleep(delay);
+    // }
 }
 
 module.exports = facebookScraper;
