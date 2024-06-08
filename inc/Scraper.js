@@ -22,7 +22,7 @@ class Scraper {
             args: [
                 "--disable-setuid-sandbox",
                 "--no-sandbox",
-                "--single-process",
+                // "--single-process",
                 "--no-zygote",
             ],
             executablePath: process.env.NODE_ENV === 'production' ?

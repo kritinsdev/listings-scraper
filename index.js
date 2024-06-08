@@ -5,7 +5,7 @@ const {sitesConfig, sites} = require('./siteConfig');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.get('/scrape', async (req, res) => {
+app.get('/scrape23hashed', async (req, res) => {
     try {
         await start();
         res.status(200).send('Scraping started.');
