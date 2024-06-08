@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { getRandomTimeout, sleep, getExistingUrls, getBlacklistUrls } = require('./helpers');
@@ -121,18 +122,20 @@ class Scraper {
     }
 
     updateUrlsFile() {
+        const filePath = path.join(__dirname, `${this.currentSite}-urls.json`);
         const allUrls = [...new Set([...this.existingListingUrls, ...this.scrapedListingUrls])];
         const jsonUrls = JSON.stringify(allUrls, null, 2);
         try {
-            fs.writeFileSync(`${this.currentSite}-urls.json`, jsonUrls, 'utf8');
+            fs.writeFileSync(filePath, jsonUrls, 'utf8');
         } catch (err) {
             console.log('Error writing to URLs file:', err);
         }
     }
 
     loadExistingUrls() {
+        const filePath = path.join(__dirname, `${this.currentSite}-urls.json`);
         try {
-            const data = fs.readFileSync(`${this.currentSite}-urls.json`, 'utf8');
+            const data = fs.readFileSync(filePath, 'utf8');
             this.existingListingUrls = JSON.parse(data);
         } catch (error) {
             console.log('No existing URLs file found or error reading file.');
