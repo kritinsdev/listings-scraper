@@ -122,7 +122,7 @@ class Scraper {
     }
 
     updateUrlsFile() {
-        const filePath = path.join(__dirname, `${this.currentSite}-urls.json`);
+        const filePath = path.join(__dirname, '..', `${this.currentSite}-urls.json`);
         const allUrls = [...new Set([...this.existingListingUrls, ...this.scrapedListingUrls])];
         const jsonUrls = JSON.stringify(allUrls, null, 2);
         try {
@@ -133,7 +133,9 @@ class Scraper {
     }
 
     loadExistingUrls() {
-        const filePath = path.join(__dirname, `${this.currentSite}-urls.json`);
+        const filePath = path.join(__dirname, '..', `${this.currentSite}-urls.json`);
+
+        console.log(filePath);
         try {
             const data = fs.readFileSync(filePath, 'utf8');
             this.existingListingUrls = JSON.parse(data);

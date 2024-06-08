@@ -1,6 +1,5 @@
 const andeleScraper = require('./inc/sites/andeleScraper');
 const ssScraper = require('./inc/sites/ssScraper');
-const facebookScraper = require('./inc/sites/facebookScraper');
 
 const sites = ['andelemandele', 'ss'];
 
@@ -24,16 +23,6 @@ const sitesConfig = {
         scrapeOnlyFirst: true,
         scraper: ssScraper,
     },
-
-    facebook: {
-        sitename: 'facebook',
-        selectors: {
-            paginator: null,
-        },
-        url:'https://www.facebook.com/marketplace/106273369404765/iphones',
-        scrapeOnlyFirst: true,
-        scraper: facebookScraper,
-    }
 };
 
 module.exports = {sites, sitesConfig};
