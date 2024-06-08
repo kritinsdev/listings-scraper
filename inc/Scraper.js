@@ -26,7 +26,7 @@ class Scraper {
                 // "--single-process",
                 "--no-zygote",
             ],
-            timeout: 0,
+            timeout: 120000,
             executablePath: process.env.NODE_ENV === 'production' ?
             process.env.PUPPETEER_EXECUTABLE_PATH :
             puppeteer.executablePath(),
