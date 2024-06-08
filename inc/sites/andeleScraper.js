@@ -8,6 +8,8 @@ puppeteer.use(StealthPlugin());
 async function andeleScraper(url, browser) {
     const page = await browser.newPage();
 
+    await page.setDefaultNavigationTimeout(0);
+
     await page.goto(url);
 
     const args = {
