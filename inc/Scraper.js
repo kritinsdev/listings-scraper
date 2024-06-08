@@ -21,18 +21,16 @@ class Scraper {
     async scrape() {
         const browser = await puppeteer.launch({
             args: [
-                "--disable-setuid-sandbox",
-                "--no-sandbox",
-                // "--single-process",
-                "--no-zygote",
+              "--disable-setuid-sandbox",
+              "--no-sandbox",
+              "--single-process",
+              "--no-zygote",
             ],
-            timeout: 0,
-            waitUntil: "domcontentloaded",
-            executablePath: process.env.NODE_ENV === 'production' ?
-            process.env.PUPPETEER_EXECUTABLE_PATH :
-            puppeteer.executablePath(),
-            headless: true,
-        });
+            executablePath:
+              process.env.NODE_ENV === "production"
+                ? process.env.PUPPETEER_EXECUTABLE_PATH
+                : puppeteer.executablePath(),
+          });
 
         const page = await browser.newPage();
 
