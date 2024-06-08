@@ -8,9 +8,10 @@ puppeteer.use(StealthPlugin());
 async function andeleScraper(url, browser) {
     const page = await browser.newPage();
 
-    await page.setDefaultNavigationTimeout(0);
-
-    await page.goto(url);
+    await page.goto(url, {
+        waitUntil: 'load',
+        timeout: 0
+    });
 
     const args = {
         url: url,
@@ -71,21 +72,21 @@ async function andeleScraper(url, browser) {
             const ft = string.toLowerCase();
             const regexGB = new RegExp('(\\d+)\\s*gb\\b', 'i');
             const regexTB = new RegExp('(\\d+)\\s*tb\\b', 'i');
-        
+
             const hasMatchGB = ft.match(regexGB);
             const hasMatchTB = ft.match(regexTB);
-        
+
             if (hasMatchTB) {
                 return parseInt(hasMatchTB[1]) * 1024;
             }
-        
+
             if (hasMatchGB) {
                 return parseInt(hasMatchGB[1]);
             }
-        
+
             return null;
         }
-    
+
         const price = document.querySelector('.product-node__price');
         const oldPrice = price.querySelector('s');
         if (oldPrice) {
@@ -116,12 +117,12 @@ async function andeleScraper(url, browser) {
             const propValue = dataRows[i].querySelector('.product-attribute-list__value').textContent.toLowerCase().trim();
 
             if (propName) {
-                if(propName == 'pievienots') {
+                if (propName == 'pievienots') {
                     const date = parseDate(propValue);
                     listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
                 }
 
-                if(propName == 'tehnikas veids' && (propValue == 'vāciņš' || propValue == 'lādētāji')) {
+                if (propName == 'tehnikas veids' && (propValue == 'vāciņš' || propValue == 'lādētāji')) {
                     listingObject.skip = true;
                     return listingObject;
                 }
