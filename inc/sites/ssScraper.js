@@ -1,9 +1,5 @@
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const ModelManager = require('../inc/ModelManager');
 const { sendToDiscord } = require('../inc/saveListing');
-
-puppeteer.use(StealthPlugin());
 
 async function ssScraper(url, browser, db) {
     const page = await browser.newPage();

@@ -1,9 +1,6 @@
 require('dotenv').config();
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const puppeteer = require('puppeteer');
 const { getRandomTimeout, sleep } = require('./helpers');
-const { executablePath } = require('puppeteer');
-puppeteer.use(StealthPlugin());
 
 class Scraper {
     constructor(config, db) {
