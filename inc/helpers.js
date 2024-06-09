@@ -12,48 +12,52 @@ function getRandomTimeout(min, max) {
     return randomNumber;
 }
 
-async function getExistingUrls(site, active = null) {
-    const apiUrl = `${process.env.API_URL}/urls`;
-    try {
-        const params = { 
-            site: site,
-            active: active
-        };
-
-        const response = await axios.get(apiUrl, {
-            params: params,
-            headers: {
-                'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
-                'Content-Type': 'application/json',
+async function sendToDiscord(listingData) {
+    const payload = {
+      embeds: [
+        {
+          description: listingData.description,
+          color: 5814783,
+          fields: [
+            {
+              name: 'Model',
+              value: listingData.modelName,
+              inline: true
+            },
+            {
+              name: 'Target Price',
+              value: `${listingData.targetPrice}€`,
+              inline: true
+            },
+            {
+              name: 'Actual Price',
+              value: `${listingData.price}€`,
+              inline: true
+            },
+            {
+              name: 'Memory',
+              value: listingData.memory ? listingData.memory : '-',
+              inline: false
+            },
+            {
+              name: 'URL',
+              value: listingData.url,
+              inline: false
             }
-        });
-        return response.data;
-
-    } catch (error) {
-        console.error('Error while getting existing URLs:', error);
-    }
-}
-
-async function getBlacklistUrls(site = null) {
-    const apiUrl = `${process.env.API_URL}/blacklist`;
+          ],
+        }
+      ]
+    };
+  
     try {
-        const params = { site: site };
-        const response = await axios.get(apiUrl, {
-            params: params,
-            headers: {
-                'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        return response.data;
+      await axios.post(process.env.WEBHOOK, payload);
     } catch (error) {
-        console.error('Error while getting existing URLs:', error);
+      console.error('Error sending message: ', error);
     }
-}
+  }
 
 module.exports = {
     sleep,
     getRandomTimeout,
-    getExistingUrls,
-    getBlacklistUrls,
+    sendToDiscord
 }

@@ -51,9 +51,19 @@ class ModelManager {
             '13 pro',
             '13 pro max',
             'se 2nd gen',
+            'se2',
+            'se 2',
             'se 3rd gen',
             'se3',
             'se 3',
+            '14',
+            '14 plus',
+            '14 pro',
+            '14 pro max',
+            '15',
+            '15 plus',
+            '15 pro',
+            '15 pro max',
         ];
     
         models.sort((a, b) => b.length - a.length);

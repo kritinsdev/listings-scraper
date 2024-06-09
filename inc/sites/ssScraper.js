@@ -1,5 +1,5 @@
 const ModelManager = require('../inc/ModelManager');
-const { sendToDiscord } = require('../inc/saveListing');
+const { sendToDiscord } = require('../helpers');
 
 async function ssScraper(url, browser, db) {
     const page = await browser.newPage();
@@ -116,7 +116,7 @@ async function ssScraper(url, browser, db) {
         listingData.modelName = modelData.modelName;
 
         if (listingData.modelId) {
-            if (Math.abs(listingData.price - listingData.targetPrice) <= 30) {
+            if (Math.abs(listingData.price - listingData.targetPrice) <= 50) {
                 await db.saveListing({
                     url: listingData.url,
                     site: listingData.site,

@@ -1,5 +1,5 @@
 const ModelManager = require('../inc/ModelManager');
-const { sendToDiscord } = require('../inc/saveListing');
+const { sendToDiscord } = require('../helpers');
 
 
 async function andeleScraper(url, browser, db) {
@@ -118,11 +118,6 @@ async function andeleScraper(url, browser, db) {
                     const date = parseDate(propValue);
                     listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
                 }
-
-                if (propName == 'tehnikas veids' && (propValue == 'vāciņš' || propValue == 'lādētāji')) {
-                    listingObject.skip = true;
-                    return listingObject;
-                }
             }
         }
 
@@ -142,31 +137,29 @@ async function andeleScraper(url, browser, db) {
         listingData.modelName = modelData.modelName;
 
         if (listingData.modelId) {
-            if (Math.abs(listingData.price - listingData.targetPrice) <= 30) {
-                await db.saveListing({
-                    url: listingData.url,
-                    site: listingData.site,
-                    status: 'scraped',
-                });
+            await db.saveListing({
+                model: listingData.modelName,
+                modelId: listingData.modelId,
+                price: listingData.price,
+                memory: listingData.memory,
+                url: listingData.url,
+                site: listingData.site,
+                status: 'scraped',
+            });
+
+            if (Math.abs(listingData.price - listingData.targetPrice) <= 50) {
                 try {
                     await sendToDiscord(listingData);
                 } catch (error) {
                     console.error('Error', error);
                 }
-            } else {
-                await db.saveListing({
-                    url: listingData.url,
-                    site: listingData.site,
-                    status: 'scraped',
-                });
             }
         } else {
             await db.saveListing({
                 url: listingData.url,
                 site: listingData.site,
-                status: 'model_not_found',
+                status: 'missing_model',
             });
-            console.log(`EXCLUDED MODEL | URL: ${listingData.url}`)
         }
     } else {
         await db.saveListing({

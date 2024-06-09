@@ -7,20 +7,20 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 app.get('/', (req, res) => {
-    res.send('Listings app');
+    res.send('Listings');
   })
 
 app.get('/scrape23hashed', async (req, res) => {
     try {
-        await start();
         res.status(200).send('Scraping started');
+        await startScrape();
     } catch (error) {
         console.error('Error during scraping:', error);
         res.status(500).send('An error occurred while scraping.');
     }
 });
 
-async function start() {
+async function startScrape() {
     const db = new Database(process.env.MONGO_URI);
     await db.connect();
 
