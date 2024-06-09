@@ -1,6 +1,4 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
-const Url = require('./urlModel');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { getRandomTimeout, sleep } = require('./helpers');
@@ -8,7 +6,8 @@ const { executablePath } = require('puppeteer');
 puppeteer.use(StealthPlugin());
 
 class Scraper {
-    constructor(config) {
+    constructor(config, db) {
+        this.db = db;
         this.siteConfig = config;
         this.currentSite = this.siteConfig.sitename;
         this.pageUrl = this.siteConfig.url;
@@ -19,25 +18,24 @@ class Scraper {
 
     async scrape() {
         console.log('=============================');
-        await this.connectDB();
-        await this.fetchExistingUrls();
+        this.existingListingUrls = await this.db.fetchExistingUrls(this.currentSite);
 
         const browser = await puppeteer.launch({
             args: [
-              "--disable-setuid-sandbox",
-              "--no-sandbox",
-              "--single-process",
-              "--no-zygote",
+                "--disable-setuid-sandbox",
+                "--no-sandbox",
+                //   "--single-process",
+                "--no-zygote",
             ],
             executablePath:
-              process.env.NODE_ENV === "production"
-                ? process.env.PUPPETEER_EXECUTABLE_PATH
-                : puppeteer.executablePath(),
-          });
+                process.env.NODE_ENV === "production"
+                    ? process.env.PUPPETEER_EXECUTABLE_PATH
+                    : puppeteer.executablePath(),
+        });
 
         const page = await browser.newPage();
 
-        await page.goto(this.pageUrl,{
+        await page.goto(this.pageUrl, {
             waitUntil: 'load',
             timeout: 0
         });
@@ -45,7 +43,7 @@ class Scraper {
         await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
 
         let newLinks = this.scrapedListingUrls.filter(url => !this.existingListingUrls.includes(url));
-        
+
         console.log(`Scraping ${this.currentSite}`);
         if (newLinks.length > 0) {
             console.log(`${newLinks.length} new listings. Scraping...`)
@@ -56,15 +54,12 @@ class Scraper {
         for (const url of newLinks) {
             const delay = getRandomTimeout(2, 4);
 
-            await this.siteConfig.scraper(url, browser);
-
-            await this.saveUrl(url);
+            await this.siteConfig.scraper(url, browser, this.db);
 
             await sleep(delay);
         }
 
         await browser.close();
-        await this.closeDB();
         console.log('Scraping finished');
         console.log('=============================');
     }
@@ -119,43 +114,6 @@ class Scraper {
                 break;
             default:
                 break;
-        }
-    }
-
-    async connectDB() {
-        try {
-            await mongoose.connect(process.env.MONGO_URI);
-            console.log('Connected to MongoDB');
-        } catch (error) {
-            console.error('Error connecting to MongoDB:', error);
-        }
-    }
-
-    async closeDB() {
-        try {
-            await mongoose.connection.close();
-            console.log('Closed MongoDB connection');
-        } catch (error) {
-            console.error('Error closing MongoDB connection:', error);
-        }
-    }
-
-    async saveUrl(url) {
-        try {
-            const newUrl = new Url({ url });
-            await newUrl.save();
-            console.log(`Saved URL: ${url}`);
-        } catch (error) {
-            console.error(`Error saving URL: ${url}`, error);
-        }
-    }
-
-    async fetchExistingUrls() {
-        try {
-            const urls = await Url.find({}, 'url').lean();
-            this.existingListingUrls = urls.map(urlObj => urlObj.url);
-        } catch (error) {
-            console.error('Error fetching existing URLs:', error);
         }
     }
 }

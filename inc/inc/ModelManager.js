@@ -55,16 +55,16 @@ class ModelManager {
             'se3',
             'se 3',
         ];
-
+    
         models.sort((a, b) => b.length - a.length);
-
+    
         const formattedText = string.toLowerCase();
         const regex = new RegExp(
-            `(${models.join('|').replace(/\s+/g, '\\s')})(?![0-9])`,
+            `\\b(${models.join('|').replace(/\s+/g, '\\s')})(?![0-9])\\b`,
             'gi'
         );
         const match = formattedText.match(regex);
-        return match ? `iPhone ${match[0]}` : null;
+        return match ? `iPhone ${match[0].trim()}` : null;
     }
 }
 

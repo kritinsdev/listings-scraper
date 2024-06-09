@@ -1,4 +1,5 @@
 const express = require('express');
+const Database = require('./inc/models/Database');
 const Scraper = require('./inc/Scraper');
 const {sitesConfig, sites} = require('./siteConfig');
 
@@ -20,13 +21,18 @@ app.get('/scrape23hashed', async (req, res) => {
 });
 
 async function start() {
-    for(let i = 0; i < sites.length; i++) {
-        const s = new Scraper(sitesConfig[sites[i]]);
+    const db = new Database(process.env.MONGO_URI);
+    await db.connect();
+
+    for (let i = 0; i < sites.length; i++) {
+        const s = new Scraper(sitesConfig[sites[i]], db);
         await s.scrape();
     }
+
+    await db.close();
 }
 
+
 app.listen(port, () => {
-    console.log(process.env.NODE_ENV);
     console.log(`Server is running on ${port}`);
 });

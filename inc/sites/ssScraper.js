@@ -1,10 +1,11 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const { saveListing, saveToBlacklist } = require('../saveListing');
-const ModelManager = require('../ModelManager');
+const ModelManager = require('../inc/ModelManager');
+const { sendToDiscord } = require('../inc/saveListing');
+
 puppeteer.use(StealthPlugin());
 
-async function ssScraper(url, browser) {
+async function ssScraper(url, browser, db) {
     const page = await browser.newPage();
 
     await page.goto(url, {
@@ -14,6 +15,7 @@ async function ssScraper(url, browser) {
 
     const args = {
         url: url,
+        site: 'ss',
     }
 
     const listingData = await page.evaluate((args) => {
@@ -34,9 +36,11 @@ async function ssScraper(url, browser) {
         }
 
         const listingObject = {};
+        listingObject.url = args.url;
+        listingObject.site = args.site;
+
         const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'Pērkam visus', 'pērkam visus']
 
-        // Price
         let price = document.querySelector('.ads_price');
 
         if (price) {
@@ -44,14 +48,12 @@ async function ssScraper(url, browser) {
             price = parseFloat(price);
         }
 
-        //Memory
         let memory = document.querySelector('#tdo_42');
         if (memory) {
             memory = memory.textContent;
             memory = parseInt(memory);
         }
 
-        // Description
         let description = document.querySelector('#msg_div_msg');
         if (description) {
             description = description.textContent.replace(/[\n+]/g, ' ').trim().toLowerCase();
@@ -59,7 +61,6 @@ async function ssScraper(url, browser) {
 
         const isBlacklisted = blacklistedWords.some(word => description.includes(word.toLowerCase()));
 
-        //Model 
         let model = document.querySelector('#tdo_44');
 
         if (model) {
@@ -67,7 +68,6 @@ async function ssScraper(url, browser) {
             model = model.replace(/apple /gi, "");
         }
 
-        //Date added 
         let added = document.querySelector('#page_main > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td:nth-child(2)');
         if (added) {
             added = added.textContent.trim();
@@ -119,19 +119,41 @@ async function ssScraper(url, browser) {
         listingData.targetPrice = modelData.targetPrice;
         listingData.modelName = modelData.modelName;
 
-        if (
-            listingData.modelId &&
-            (Math.abs(listingData.price - listingData.targetPrice) <= 40)
-        ) {
-            try {
-                await sendToDiscord(listingData);
-            } catch (error) {
-                console.error('Error', error);
+        if (listingData.modelId) {
+            if (Math.abs(listingData.price - listingData.targetPrice) <= 30) {
+                await db.saveListing({
+                    url: listingData.url,
+                    site: listingData.site,
+                    status: 'scraped',
+                });
+                try {
+                    await sendToDiscord(listingData);
+                } catch (error) {
+                    console.error('Error', error);
+                }
+            } else {
+                await db.saveListing({
+                    url: listingData.url,
+                    site: listingData.site,
+                    status: 'scraped',
+                });
             }
-        } else if (!listingData.modelId) {
-            console.log(`MODEL NOT FOUND | URL: ${listingData.url}`)
+        } else {
+            await db.saveListing({
+                url: listingData.url,
+                site: listingData.site,
+                status: 'model_not_found',
+            });
+            console.log(`EXCLUDED MODEL | URL: ${listingData.url}`)
         }
+    } else {
+        await db.saveListing({
+            url: listingData.url,
+            site: listingData.site,
+            status: 'listing_skipped',
+        });
     }
+
 
     await page.close();
 }

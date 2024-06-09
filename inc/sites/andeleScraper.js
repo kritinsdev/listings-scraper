@@ -1,11 +1,11 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const ModelManager = require('../ModelManager');
-const { sendToDiscord } = require('../saveListing');
+const ModelManager = require('../inc/ModelManager');
+const { sendToDiscord } = require('../inc/saveListing');
 
 puppeteer.use(StealthPlugin());
 
-async function andeleScraper(url, browser) {
+async function andeleScraper(url, browser, db) {
     const page = await browser.newPage();
 
     await page.goto(url, {
@@ -15,16 +15,17 @@ async function andeleScraper(url, browser) {
 
     const args = {
         url: url,
+        site: 'andelemandele',
     }
 
     const listingData = await page.evaluate((args) => {
         const listingObject = {};
+        listingObject.url = args.url;
+        listingObject.site = args.site;
 
         const unavailable = document.querySelector('.block-404');
         if (unavailable) {
             listingObject.skip = true;
-            listingObject.url = args.url;
-            listingObject.skipReason = 'Listing is sold or removed';
             return listingObject;
         }
 
@@ -105,7 +106,6 @@ async function andeleScraper(url, browser) {
         title = title.textContent.replace(/\t|\n/g, '');
 
         listingObject.modelId = null;
-        listingObject.url = args.url;
         listingObject.fullTitle = title;
         listingObject.description = formattedDescription;
         listingObject.memory = findMemory(title) ? findMemory(title) : findMemory(formattedDescription);
@@ -131,7 +131,6 @@ async function andeleScraper(url, browser) {
 
         if (listingObject.price < 25) {
             listingObject.skip = true;
-            listingObject.skipReason = `Price is less than 25 euros / URL: ${args.url}`;
             return listingObject;
         }
 
@@ -145,18 +144,39 @@ async function andeleScraper(url, browser) {
         listingData.targetPrice = modelData.targetPrice;
         listingData.modelName = modelData.modelName;
 
-        if (
-            listingData.modelId &&
-            (Math.abs(listingData.price - listingData.targetPrice) <= 40)
-        ) {
-            try {
-                await sendToDiscord(listingData);
-            } catch (error) {
-                console.error('Error', error);
+        if (listingData.modelId) {
+            if (Math.abs(listingData.price - listingData.targetPrice) <= 30) {
+                await db.saveListing({
+                    url: listingData.url,
+                    site: listingData.site,
+                    status: 'scraped',
+                });
+                try {
+                    await sendToDiscord(listingData);
+                } catch (error) {
+                    console.error('Error', error);
+                }
+            } else {
+                await db.saveListing({
+                    url: listingData.url,
+                    site: listingData.site,
+                    status: 'scraped',
+                });
             }
-        } else if (!listingData.modelId) {
-            console.log(`MODEL NOT FOUND | URL: ${listingData.url}`)
+        } else {
+            await db.saveListing({
+                url: listingData.url,
+                site: listingData.site,
+                status: 'model_not_found',
+            });
+            console.log(`EXCLUDED MODEL | URL: ${listingData.url}`)
         }
+    } else {
+        await db.saveListing({
+            url: listingData.url,
+            site: listingData.site,
+            status: 'listing_skipped',
+        });
     }
 
     await page.close();
