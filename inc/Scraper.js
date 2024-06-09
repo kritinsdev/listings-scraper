@@ -21,7 +21,7 @@ class Scraper {
             args: [
                 "--disable-setuid-sandbox",
                 "--no-sandbox",
-                //   "--single-process",
+                "--single-process",
                 "--no-zygote",
             ],
             executablePath:
