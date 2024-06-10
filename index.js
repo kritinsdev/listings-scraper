@@ -1,14 +1,33 @@
 const express = require('express');
 const Database = require('./inc/models/Database');
 const Scraper = require('./inc/Scraper');
-const {sitesConfig, sites} = require('./siteConfig');
+const { sitesConfig, sites } = require('./siteConfig');
+const { sendToDiscord } = require('./inc/helpers');
+const axios = require('axios');
+
 
 const app = express();
 const port = process.env.PORT || 4000;
 
 app.get('/', (req, res) => {
     res.send('Listings');
-  })
+});
+
+app.get('/test', async (req, res) => {
+    const payload = {
+        embeds: [
+          {
+            description: 'Ranodm message',
+            color: 5814783,
+          }
+        ]
+      };
+  try {
+      await axios.post(process.env.WEBHOOK, payload);
+    } catch (error) {
+      console.error('Error sending message: ', error);
+    }
+});
 
 app.get('/scrape23hashed', async (req, res) => {
     try {

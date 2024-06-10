@@ -22,6 +22,7 @@ class Scraper {
                 "--disable-setuid-sandbox",
                 "--no-sandbox",
                 "--no-zygote",
+                "--disable-dev-shm-usage",
             ],
             executablePath:
                 process.env.NODE_ENV === "production"
@@ -57,7 +58,6 @@ class Scraper {
 
         await browser.close();
         console.log('Scraping finished');
-        console.log('=============================');
     }
 
     async getTotalPages(page) {
