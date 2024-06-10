@@ -4,7 +4,7 @@ const { sendToDiscord } = require('../helpers');
 async function ssScraper(url, browser, db) {
     const page = await browser.newPage();
 
-    await page.goto(url, {timeout: 0});
+    await page.goto(url, { timeout: 0 });
 
     const args = {
         url: url,
@@ -32,7 +32,17 @@ async function ssScraper(url, browser, db) {
         listingObject.url = args.url;
         listingObject.site = args.site;
 
-        const blacklistedWords = ['lombards', 'lombardā', 'filiāle', 'filiālē', 'banknote', 'internetveikals', 'internetveikalā', 'Pērkam visus', 'pērkam visus']
+        const blacklistedWords = [
+            'lombards',
+            'lombardā',
+            'filiāle',
+            'filiālē',
+            'banknote',
+            'internetveikals',
+            'internetveikalā',
+            'Pērkam visus',
+            'pērkam visus'
+        ]
 
         let price = document.querySelector('.ads_price');
 
@@ -88,17 +98,10 @@ async function ssScraper(url, browser, db) {
 
         if (listingObject.price < 25) {
             listingObject.skip = true;
-            listingObject.skipReason = `Price is less than 25 euros / URL: ${args.url}`;
-        }
-
-        if (!listingObject.model_id) {
-            listingObject.skip = true;
-            listingObject.skipReason = `Could not find model / URL: ${args.url}`;
         }
 
         if (isBlacklisted) {
             listingObject.skip = true;
-            listingObject.skipReason = `Contains blacklisted word / URL: ${args.url}`;
         }
 
         return listingObject;
@@ -113,31 +116,35 @@ async function ssScraper(url, browser, db) {
         listingData.modelName = modelData.modelName;
 
         if (listingData.modelId) {
-            if (Math.abs(listingData.price - listingData.targetPrice) <= 50) {
-                await db.saveListing({
-                    url: listingData.url,
-                    site: listingData.site,
-                    status: 'scraped',
-                });
-                try {
-                    await sendToDiscord(listingData);
-                } catch (error) {
-                    console.error('Error', error);
-                }
-            } else {
-                await db.saveListing({
-                    url: listingData.url,
-                    site: listingData.site,
-                    status: 'scraped',
-                });
+            await db.saveListing({
+                model: listingData.modelName,
+                modelId: listingData.modelId,
+                price: listingData.price,
+                memory: listingData.memory,
+                url: listingData.url,
+                site: listingData.site,
+                status: 'scraped',
+            });
+
+            try {
+                await sendToDiscord(listingData);
+            } catch (error) {
+                console.error('Error', error);
             }
+
+            // if (Math.abs(listingData.price - listingData.targetPrice) <= 50) {
+                // try {
+                //     await sendToDiscord(listingData);
+                // } catch (error) {
+                //     console.error('Error', error);
+                // }
+            // }
         } else {
             await db.saveListing({
                 url: listingData.url,
                 site: listingData.site,
-                status: 'model_not_found',
+                status: 'missing_model',
             });
-            console.log(`EXCLUDED MODEL | URL: ${listingData.url}`)
         }
     } else {
         await db.saveListing({
