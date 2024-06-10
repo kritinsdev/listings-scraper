@@ -18,11 +18,11 @@ class Scraper {
         this.existingListingUrls = await this.db.fetchExistingUrls(this.currentSite);
 
         const browser = await puppeteer.launch({
+            headless: true,
             args: [
                 "--disable-setuid-sandbox",
                 "--no-sandbox",
                 "--no-zygote",
-                "--disable-dev-shm-usage",
             ],
             executablePath:
                 process.env.NODE_ENV === "production"
@@ -32,10 +32,7 @@ class Scraper {
 
         const page = await browser.newPage();
 
-        await page.goto(this.pageUrl, {
-            waitUntil: 'load',
-            timeout: 0
-        });
+        await page.goto(this.pageUrl);
 
         await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
 
