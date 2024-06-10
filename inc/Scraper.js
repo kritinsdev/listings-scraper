@@ -32,7 +32,7 @@ class Scraper {
 
         const page = await browser.newPage();
 
-        await page.goto(this.pageUrl);
+        await page.goto(this.pageUrl, {timeout: 0});
 
         await this.collectUrls(page, await this.getTotalPages(page), this.pageUrl);
 

@@ -4,7 +4,7 @@ const { sendToDiscord } = require('../helpers');
 async function ssScraper(url, browser, db) {
     const page = await browser.newPage();
 
-    await page.goto(url);
+    await page.goto(url, {timeout: 0});
 
     const args = {
         url: url,
