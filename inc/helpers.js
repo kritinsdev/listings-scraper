@@ -43,6 +43,11 @@ async function sendToDiscord(listingData) {
               name: 'URL',
               value: listingData.url,
               inline: false
+            },
+            {
+              name: 'Added',
+              value: listingData.added,
+              inline: false
             }
           ],
         }
