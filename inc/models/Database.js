@@ -51,12 +51,35 @@ class Database {
             console.error(`Error saving URL: ${listing.url}`, error);
         }
     }
+
     async fetchExistingUrls(site) {
         try {
             const urls = await Listing.find({ site }, 'url').lean();
             return urls.map(urlObj => urlObj.url);
         } catch (error) {
             console.error('Error fetching existing URLs:', error);
+            return [];
+        }
+    }
+
+    async fetchListings(site) {
+        try {
+            const query = site ? { site } : {};
+            const listings = await Listing.find(query).lean();
+            return listings;
+        } catch (error) {
+            console.error('Error fetching listings:', error);
+            return [];
+        }
+    }
+
+    async fetchListingsByModelId(modelId) {
+        try {
+            const query = modelId ? { modelId } : {};
+            const listings = await Listing.find(query).lean();
+            return listings;
+        } catch (error) {
+            console.error('Error fetching listings by modelId:', error);
             return [];
         }
     }

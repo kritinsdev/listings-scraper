@@ -1,7 +1,7 @@
 const andeleScraper = require('./inc/sites/andeleScraper');
 const ssScraper = require('./inc/sites/ssScraper');
 
-const sites = ['andelemandele'];
+const sites = ['andelemandele', 'ss'];
 
 const sitesConfig = {
     andelemandele: {
@@ -10,7 +10,7 @@ const sitesConfig = {
             paginator: '.paginator',
         },
         url: 'https://www.andelemandele.lv/perles/elektronika/telefoni/#attributes:573/order:created/brand:3232',
-        scrapeOnlyFirst: false,
+        scrapeOnlyFirst: true,
         scraper: andeleScraper,
     },
 

@@ -96,7 +96,7 @@ async function ssScraper(url, browser, db) {
 
         listingObject.added = new Date(added.getTime() - added.getTimezoneOffset() * 60000).toISOString();
 
-        if (listingObject.price < 25) {
+        if (listingObject.price < 50) {
             listingObject.skip = true;
         }
 
@@ -123,11 +123,11 @@ async function ssScraper(url, browser, db) {
                 memory: listingData.memory,
                 url: listingData.url,
                 site: listingData.site,
-                status: 'scraped',
+                status: 'listing_scraped',
             });
 
             try {
-                await sendToDiscord(listingData);
+                // await sendToDiscord(listingData);
             } catch (error) {
                 console.error('Error', error);
             }
@@ -136,7 +136,7 @@ async function ssScraper(url, browser, db) {
             await db.saveListing({
                 url: listingData.url,
                 site: listingData.site,
-                status: 'missing_model',
+                status: 'listing_missing_model',
             });
         }
     } else {
