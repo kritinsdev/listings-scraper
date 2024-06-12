@@ -26,18 +26,27 @@ class Database {
 
     async saveListing(object) {
         try {
-            const listing = new ListingModel({
-                url: object.url,
-                site: object.site,
-                status: object.status,
-            });
-            await listing.save();
-            console.log(`Saved URL: ${object.url}`);
+            const result = await ListingModel.updateOne(
+                { url: object.url },
+                {
+                    $setOnInsert: {
+                        url: object.url,
+                        site: object.site,
+                        status: object.status,
+                    }
+                },
+                { upsert: true }
+            );
+    
+            if (result.upsertedCount > 0) {
+                console.log(`Inserted new URL: ${object.url}`);
+            } else {
+                console.log(`URL already exists: ${object.url}`);
+            }
         } catch (error) {
             console.error(`Error saving URL: ${object.url}`, error);
         }
     }
-
     async fetchExistingUrls(site) {
         try {
             const urls = await ListingModel.find({ site }, 'url').lean();
