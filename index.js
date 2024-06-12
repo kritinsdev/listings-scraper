@@ -13,22 +13,6 @@ app.get('/', (req, res) => {
     res.send('Listings');
 });
 
-app.get('/test', async (req, res) => {
-    const payload = {
-        embeds: [
-          {
-            description: 'Ranodm message',
-            color: 5814783,
-          }
-        ]
-      };
-  try {
-      await axios.post(process.env.WEBHOOK, payload);
-    } catch (error) {
-      console.error('Error sending message: ', error);
-    }
-});
-
 app.get('/scrape23hashed', async (req, res) => {
     try {
         res.status(200).send('Scraping started');

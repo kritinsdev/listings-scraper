@@ -118,7 +118,7 @@ async function andeleScraper(url, browser, db) {
             }
         }
 
-        if (listingObject.price < 25) {
+        if (listingObject.price < 50) {
             listingObject.skip = true;
             return listingObject;
         }
@@ -141,7 +141,7 @@ async function andeleScraper(url, browser, db) {
                 memory: listingData.memory,
                 url: listingData.url,
                 site: listingData.site,
-                status: 'scraped',
+                status: 'listing_scraped',
             });
 
             try {
@@ -149,19 +149,11 @@ async function andeleScraper(url, browser, db) {
             } catch (error) {
                 console.error('Error', error);
             }
-
-            // if (Math.abs(listingData.price - listingData.targetPrice) <= 50) {
-                // try {
-                //     await sendToDiscord(listingData);
-                // } catch (error) {
-                //     console.error('Error', error);
-                // }
-            // }
         } else {
             await db.saveListing({
                 url: listingData.url,
                 site: listingData.site,
-                status: 'missing_model',
+                status: 'listing_missing_model',
             });
         }
     } else {

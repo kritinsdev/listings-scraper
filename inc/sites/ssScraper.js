@@ -132,13 +132,6 @@ async function ssScraper(url, browser, db) {
                 console.error('Error', error);
             }
 
-            // if (Math.abs(listingData.price - listingData.targetPrice) <= 50) {
-                // try {
-                //     await sendToDiscord(listingData);
-                // } catch (error) {
-                //     console.error('Error', error);
-                // }
-            // }
         } else {
             await db.saveListing({
                 url: listingData.url,

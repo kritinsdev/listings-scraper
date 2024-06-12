@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const listingSchema = new mongoose.Schema({
+const schema = new mongoose.Schema({
     model: { type: String, required: false},
     modelId: { type: Number, required: false},
     price: {type: Number, required: false},
@@ -11,6 +11,6 @@ const listingSchema = new mongoose.Schema({
     scrapedAt: { type: Date, default: Date.now }
 });
 
-const Listing = mongoose.model('Listing', listingSchema);
+const Listing = mongoose.model('Listing', schema);
 
 module.exports = Listing;

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ListingModel = require('../models/Listing');
+const Listing = require('../models/Listing');
 
 class Database {
     constructor(uri) {
@@ -24,32 +24,36 @@ class Database {
         }
     }
 
-    async saveListing(object) {
+    async saveListing(listing) {
         try {
-            const result = await ListingModel.updateOne(
-                { url: object.url },
+            const result = await Listing.updateOne(
+                { url: listing.url },
                 {
                     $setOnInsert: {
-                        url: object.url,
-                        site: object.site,
-                        status: object.status,
+                        model: listing.model,
+                        modelId: listing.modelId,
+                        price: listing.price,
+                        memory: listing.memory,
+                        url: listing.url,
+                        site: listing.site,
+                        status: listing.status,
                     }
                 },
                 { upsert: true }
             );
     
             if (result.upsertedCount > 0) {
-                console.log(`Inserted new URL: ${object.url}`);
+                console.log(`Inserted new URL: ${listing.url}`);
             } else {
-                console.log(`URL already exists: ${object.url}`);
+                console.log(`URL already exists: ${listing.url}`);
             }
         } catch (error) {
-            console.error(`Error saving URL: ${object.url}`, error);
+            console.error(`Error saving URL: ${listing.url}`, error);
         }
     }
     async fetchExistingUrls(site) {
         try {
-            const urls = await ListingModel.find({ site }, 'url').lean();
+            const urls = await Listing.find({ site }, 'url').lean();
             return urls.map(urlObj => urlObj.url);
         } catch (error) {
             console.error('Error fetching existing URLs:', error);
