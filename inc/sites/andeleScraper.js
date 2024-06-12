@@ -144,10 +144,12 @@ async function andeleScraper(url, browser, db) {
                 status: 'listing_scraped',
             });
 
-            try {
-                await sendToDiscord(listingData);
-            } catch (error) {
-                console.error('Error', error);
+            if((Math.abs(listingData.price - listingData.targetPrice) <= 69)) {
+                try {
+                    await sendToDiscord(listingData);
+                } catch (error) {
+                    console.error('Error', error);
+                }
             }
         } else {
             await db.saveListing({
