@@ -20,9 +20,9 @@ class Scraper {
         const browser = await puppeteer.launch({
             headless: true,
             args: [
-                "--disable-setuid-sandbox",
-                "--no-sandbox",
-                "--no-zygote",
+                // "--disable-setuid-sandbox",
+                // "--no-sandbox",
+                // "--no-zygote",
             ],
             executablePath:
                 process.env.NODE_ENV === "production"

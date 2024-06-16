@@ -45,8 +45,8 @@ async function sendToDiscord(listingData) {
               inline: false
             },
             {
-              name: 'Added',
-              value: listingData.added,
+              name: 'Listing added',
+              value: listingData.createdAt,
               inline: false
             }
           ],

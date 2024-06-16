@@ -64,7 +64,7 @@ async function andeleScraper(url, browser, db) {
             }
         
             const day = parseInt(dateParts[0], 10);
-            const month = monthNames[dateParts[1].toLowerCase()]; // Adjust for case sensitivity
+            const month = monthNames[dateParts[1].toLowerCase()];
             const timeParts = parts[1].split(':');
             if (timeParts.length !== 2) {
                 throw new Error(`Invalid time string format: ${parts[1]}`);
@@ -167,9 +167,9 @@ async function andeleScraper(url, browser, db) {
                 status: 'listing_scraped',
             });
 
-            if((Math.abs(listing.price - modelData.targetPrice) <= 100)) {
+            if((Math.abs(listing.price - modelData.targetPrice) <= 125)) {
                 try {
-                    // await sendToDiscord(listing);
+                    await sendToDiscord(listing);
                 } catch (error) {
                     console.error('Error', error);
                 }
