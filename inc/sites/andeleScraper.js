@@ -167,7 +167,7 @@ async function andeleScraper(url, browser, db) {
                 status: 'listing_scraped',
             });
 
-            if((Math.abs(listing.price - modelData.targetPrice) <= 125)) {
+            if((Math.abs(listing.price - modelData.price) <= 125)) {
                 try {
                     await sendToDiscord(listing);
                 } catch (error) {
