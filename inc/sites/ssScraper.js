@@ -124,8 +124,17 @@ async function ssScraper(url, browser, db) {
             });
 
             if((Math.abs(listing.price - modelData.price) <= 125)) {
+                data = {
+                    description: listing.description,
+                    model: modelData.model[0],
+                    targetPrice: modelData.price,
+                    price: listing.price,
+                    memory: listing.memory,
+                    url: listing.url,
+                    createdAt: listing.createdAt,
+                }
                 try {
-                    await sendToDiscord(listing);
+                    await sendToDiscord(data);
                 } catch (error) {
                     console.error('Error', error);
                 }

@@ -12,41 +12,41 @@ function getRandomTimeout(min, max) {
     return randomNumber;
 }
 
-async function sendToDiscord(listingData) {
+async function sendToDiscord(listing) {
     const payload = {
       embeds: [
         {
-          description: listingData.description,
+          description: listing.description,
           color: 5814783,
           fields: [
             {
               name: 'Model',
-              value: listingData.modelName,
+              value: listing.model,
               inline: true
             },
             {
               name: 'Target Price',
-              value: `${listingData.targetPrice}€`,
+              value: `${listing.targetPrice}€`,
               inline: true
             },
             {
               name: 'Actual Price',
-              value: `${listingData.price}€`,
+              value: `${listing.price}€`,
               inline: true
             },
             {
               name: 'Memory',
-              value: listingData.memory ? listingData.memory : '-',
+              value: listing.memory ? listing.memory : '-',
               inline: false
             },
             {
               name: 'URL',
-              value: listingData.url,
+              value: listing.url,
               inline: false
             },
             {
               name: 'Listing added',
-              value: listingData.createdAt,
+              value: listing.createdAt,
               inline: false
             }
           ],
