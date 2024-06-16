@@ -10,7 +10,7 @@ const sitesConfig = {
             paginator: '.paginator',
         },
         url: 'https://www.andelemandele.lv/perles/elektronika/telefoni/#attributes:573/order:created/brand:3232',
-        scrapeOnlyFirst: false,
+        scrapeOnlyFirst: true,
         scraper: andeleScraper,
     },
 
@@ -20,7 +20,7 @@ const sitesConfig = {
             paginator: '.td2',
         },
         url: 'https://www.ss.lv/lv/electronics/phones/mobile-phones/apple/sell/',
-        scrapeOnlyFirst: false,
+        scrapeOnlyFirst: true,
         scraper: ssScraper,
     },
 };
