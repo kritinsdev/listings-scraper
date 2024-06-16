@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Listings</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .model-form {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Listings</h1>
+
+    <!-- Form to filter listings -->
+    <form class="model-form" method="get" action="/api/listings">
+        <label for="model-select">Choose a model:</label>
+        <select id="model-select" name="modelId">
+            <option value="">All Models</option>
+            <% modelMap.forEach(model => { %>
+                <option value="<%= model.id %>"><%= model.model %> - <%= model.memory ? model.memory + 'GB' : 'No memory' %></option>
+            <% }) %>
+        </select>
+
+        <label for="sort-select">Sort by price:</label>
+        <select id="sort-select" name="sortPrice">
+            <option value="">No Sort</option>
+            <option value="asc">Lowest to Highest</option>
+            <option value="desc">Highest to Lowest</option>
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Model ID</th>
+                <th>Price</th>
+                <th>Memory</th>
+                <th>URL</th>
+                <th>Site</th>
+                <th>Status</th>
+                <th>Scraped At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% listings.forEach(listing => { %>
+                <tr>
+                    <td><%= listing.model %></td>
+                    <td><%= listing.modelId %></td>
+                    <td><%= listing.price %></td>
+                    <td><%= listing.memory %></td>
+                    <td><a href="<%= listing.url %>" target="_blank">Link</a></td>
+                    <td><%= listing.site %></td>
+                    <td><%= listing.status %></td>
+                    <td>
+                        <%= new Intl.DateTimeFormat('en-GB', {
+                            day: '2-digit', month: '2-digit', year: '2-digit',
+                            hour: '2-digit', minute: '2-digit'
+                        }).format(new Date(listing.scrapedAt)) %>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</body>
+</html>

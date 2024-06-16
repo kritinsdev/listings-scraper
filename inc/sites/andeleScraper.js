@@ -12,7 +12,7 @@ async function andeleScraper(url, browser, db) {
         site: 'andelemandele',
     }
 
-    const listingData = await page.evaluate((args) => {
+    const listing = await page.evaluate((args) => {
         const listingObject = {};
         listingObject.url = args.url;
         listingObject.site = args.site;
@@ -40,25 +40,44 @@ async function andeleScraper(url, browser, db) {
 
         function parseDate(dateString) {
             const today = new Date();
-
+        
             if (dateString.startsWith('šodien')) {
                 const time = dateString.split(',')[1].trim().split(':');
-                return new Date(today.getFullYear(), today.getMonth(), today.getDate(), +time[0], +time[1]);
+                const date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), +time[0], +time[1]);
+                return date;
             }
-
+        
             if (dateString.startsWith('vakar')) {
                 const time = dateString.split(',')[1].trim().split(':');
-                return new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1, +time[0], +time[1]);
+                const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1, +time[0], +time[1]);
+                return date;
             }
-
+        
             const parts = dateString.split(', ');
+            if (parts.length !== 2) {
+                throw new Error(`Invalid date string format: ${dateString}`);
+            }
+        
             const dateParts = parts[0].split('. ');
+            if (dateParts.length !== 2) {
+                throw new Error(`Invalid date string format: ${dateString}`);
+            }
+        
             const day = parseInt(dateParts[0], 10);
-            const month = monthNames[dateParts[1]];
+            const month = monthNames[dateParts[1].toLowerCase()]; // Adjust for case sensitivity
             const timeParts = parts[1].split(':');
+            if (timeParts.length !== 2) {
+                throw new Error(`Invalid time string format: ${parts[1]}`);
+            }
+            
             const hour = parseInt(timeParts[0], 10);
             const minute = parseInt(timeParts[1], 10);
-
+        
+            // Check for valid month index
+            if (isNaN(month) || month < 0 || month > 11) {
+                throw new Error(`Invalid month: ${dateParts[1]}`);
+            }
+        
             return new Date(today.getFullYear(), month, day, hour, minute);
         }
 
@@ -99,7 +118,6 @@ async function andeleScraper(url, browser, db) {
         });
         title = title.textContent.replace(/\t|\n/g, '');
 
-        listingObject.modelId = null;
         listingObject.fullTitle = title;
         listingObject.description = formattedDescription;
         listingObject.memory = findMemory(title) ? findMemory(title) : findMemory(formattedDescription);
@@ -108,12 +126,19 @@ async function andeleScraper(url, browser, db) {
         const dataRows = document.querySelectorAll('.product-attribute-list > tbody > tr');
         for (let i = 0; i < dataRows.length; i++) {
             const propName = dataRows[i].querySelector('.product-attribute-list__key').textContent.toLowerCase().trim();
-            const propValue = dataRows[i].querySelector('.product-attribute-list__value').textContent.toLowerCase().trim();
+            const propValue = dataRows[i].querySelector('.product-attribute-list__value');
 
             if (propName) {
                 if (propName == 'pievienots') {
-                    const date = parseDate(propValue);
-                    listingObject.added = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+                    const span = propValue.querySelector('span')
+                    if(span) {
+                        span.remove();
+                    }
+
+                    date = propValue.textContent;
+
+                    let parsedDate = parseDate(date.toLowerCase());
+                    listingObject.createdAt = parsedDate.toLocaleString('en-GB', { timeZone: 'Europe/Riga' });
                 }
             }
         }
@@ -126,42 +151,40 @@ async function andeleScraper(url, browser, db) {
         return listingObject;
     }, args);
 
-    if (!listingData.skip) {
-        const modelData = new ModelManager(listingData).findModel();
+    if (!listing.skip) {
+        const modelData = new ModelManager(listing).findModel();
 
-        listingData.modelId = modelData.modelId;
-        listingData.targetPrice = modelData.targetPrice;
-        listingData.modelName = modelData.modelName;
-
-        if (listingData.modelId) {
+        if (modelData.id) {
             await db.saveListing({
-                model: listingData.modelName,
-                modelId: listingData.modelId,
-                price: listingData.price,
-                memory: listingData.memory,
-                url: listingData.url,
-                site: listingData.site,
+                model: modelData.model[0],
+                modelId: modelData.id,
+                series: modelData.series,
+                price: listing.price,
+                memory: listing.memory,
+                url: listing.url,
+                site: listing.site,
+                createdAt: listing.createdAt,
                 status: 'listing_scraped',
             });
 
-            if((Math.abs(listingData.price - listingData.targetPrice) <= 69)) {
+            if((Math.abs(listing.price - modelData.targetPrice) <= 100)) {
                 try {
-                    await sendToDiscord(listingData);
+                    // await sendToDiscord(listing);
                 } catch (error) {
                     console.error('Error', error);
                 }
             }
         } else {
             await db.saveListing({
-                url: listingData.url,
-                site: listingData.site,
+                url: listing.url,
+                site: listing.site,
                 status: 'listing_missing_model',
             });
         }
     } else {
         await db.saveListing({
-            url: listingData.url,
-            site: listingData.site,
+            url: listing.url,
+            site: listing.site,
             status: 'listing_skipped',
         });
     }

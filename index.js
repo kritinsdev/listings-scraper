@@ -28,26 +28,6 @@ app.get('/scrape23hashed', async (req, res) => {
     }
 });
 
-// app.get('/api/listings', async (req, res) => {
-//     try {
-//         const site = req.query.site;
-//         const listings = await db.fetchListings(site);
-//         res.json(listings);
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-// });
-
-// app.get('/api/listings/model', async (req, res) => {
-//     try {
-//         const modelId = req.query.modelId; // Get modelId parameter from query string
-//         const listings = await db.fetchListingsByModelId(modelId);
-//         res.json(listings);
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-// });
-
 async function startScrape() {
     for (let i = 0; i < sites.length; i++) {
         const s = new Scraper(sitesConfig[sites[i]], db);

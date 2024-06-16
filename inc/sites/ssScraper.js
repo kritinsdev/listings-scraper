@@ -11,7 +11,7 @@ async function ssScraper(url, browser, db) {
         site: 'ss',
     }
 
-    const listingData = await page.evaluate((args) => {
+    const listing = await page.evaluate((args) => {
         function parseDateString(dateString) {
             const cleanedDateString = dateString.replace('Datums: ', '');
 
@@ -71,10 +71,10 @@ async function ssScraper(url, browser, db) {
             model = model.replace(/apple /gi, "");
         }
 
-        let added = document.querySelector('#page_main > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td:nth-child(2)');
-        if (added) {
-            added = added.textContent.trim();
-            added = parseDateString(added);
+        let createdAt = document.querySelector('#page_main > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td:nth-child(2)');
+        if (createdAt) {
+            createdAt = createdAt.textContent.trim();
+            createdAt = parseDateString(createdAt);
         }
 
         let element = document.querySelector('#msg_div_msg');
@@ -93,8 +93,7 @@ async function ssScraper(url, browser, db) {
         listingObject.memory = memory;
         listingObject.description = text;
         listingObject.fullTitle = model;
-
-        listingObject.added = new Date(added.getTime() - added.getTimezoneOffset() * 60000).toISOString();
+        listingObject.createdAt = createdAt.toLocaleString('en-GB', { timeZone: 'Europe/Riga' });
 
         if (listingObject.price < 50) {
             listingObject.skip = true;
@@ -108,46 +107,43 @@ async function ssScraper(url, browser, db) {
 
     }, args);
 
-    if (!listingData.skip) {
-        const modelData = new ModelManager(listingData).findModel();
+    if (!listing.skip) {
+        const modelData = new ModelManager(listing).findModel();
 
-        listingData.modelId = modelData.modelId;
-        listingData.targetPrice = modelData.targetPrice;
-        listingData.modelName = modelData.modelName;
-
-        if (listingData.modelId) {
+        if (modelData.id) {
             await db.saveListing({
-                model: listingData.modelName,
-                modelId: listingData.modelId,
-                price: listingData.price,
-                memory: listingData.memory,
-                url: listingData.url,
-                site: listingData.site,
+                model: modelData.model[0],
+                modelId: modelData.id,
+                series: modelData.series,
+                price: listing.price,
+                memory: listing.memory,
+                url: listing.url,
+                site: listing.site,
+                createdAt: listing.createdAt,
                 status: 'listing_scraped',
             });
 
-            if((Math.abs(listingData.price - listingData.targetPrice) <= 69)) {
+            if((Math.abs(listing.price - modelData.targetPrice) <= 100)) {
                 try {
-                    await sendToDiscord(listingData);
+                    // await sendToDiscord(listing);
                 } catch (error) {
                     console.error('Error', error);
                 }
             }
         } else {
             await db.saveListing({
-                url: listingData.url,
-                site: listingData.site,
+                url: listing.url,
+                site: listing.site,
                 status: 'listing_missing_model',
             });
         }
     } else {
         await db.saveListing({
-            url: listingData.url,
-            site: listingData.site,
+            url: listing.url,
+            site: listing.site,
             status: 'listing_skipped',
         });
     }
-
 
     await page.close();
 }

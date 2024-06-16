@@ -1,80 +1,86 @@
-const { modelMap } = require("./modelMap");
+const { modelMap, modelLookup } = require("./modelMap");
 
 class ModelManager {
     constructor(modelData) {
-        this.listingTitle = modelData.fullTitle;
-        this.memory = (modelData.memory) ? modelData.memory : null;
+        this.listingTitle = modelData.fullTitle ? modelData.fullTitle.toLowerCase() : null;
+
+        if (this.listingTitle) {
+            this.listingTitle = this.listingTitle.replace(/[^\w\s]/gi, '');
+        }
+
+        this.memory = modelData.memory ? modelData.memory : null;
     }
 
     findModel() {
         const modelName = this.findModelName(this.listingTitle);
+
         if (!modelName) {
             return {};
         }
 
-        for (let model of modelMap) {
-            if (model.model.toLowerCase() === modelName.toLowerCase() && model.memory === this.memory) {
-                const details = {
-                    modelId: model.id,
-                    targetPrice: model.price,
-                    modelName: model.model,
-                }
+        const model = modelMap.find(m => m.model.includes(modelName) && (this.memory === null || m.memory === this.memory));
 
-                return details;
-            }
-        }
-
-        return {};
+        return model || {};
     }
 
     findModelName(string) {
-        const models = [
-            '7',
-            '7 plus',
-            '7+',
-            '8',
-            '8 plus',
-            '8+',
-            'x',
-            'xr',
-            'xs',
-            'xs max',
-            '11',
-            '11 pro',
-            '11 pro max',
-            '12',
-            '12 mini',
-            '12 pro',
-            '12 pro max',
-            '13',
-            '13 mini',
-            '13 pro',
-            '13 pro max',
-            'se 2nd gen',
-            'se2',
-            'se 2',
-            'se 3rd gen',
-            'se3',
-            'se 3',
-            '14',
-            '14 plus',
-            '14 pro',
-            '14 pro max',
-            '15',
-            '15 plus',
-            '15 pro',
-            '15 pro max',
-        ];
-    
-        models.sort((a, b) => b.length - a.length);
-    
-        const formattedText = string.toLowerCase();
-        const regex = new RegExp(
-            `\\b(${models.join('|').replace(/\s+/g, '\\s')})(?![0-9])\\b`,
-            'gi'
-        );
-        const match = formattedText.match(regex);
-        return match ? `iPhone ${match[0].trim()}` : null;
+        if (!string) {
+            return null;
+        }
+
+        const words = string.split(/\s+/);
+
+        let matchedModel = null;
+        for (let i = 0; i < words.length; i++) {
+            for (let j = i + 1; j <= words.length; j++) {
+                const modelCandidate = words.slice(i, j).join(' ');
+                if (modelLookup[modelCandidate]) {
+                    matchedModel = modelCandidate;
+                }
+            }
+        }
+
+        return matchedModel;
+    }
+
+    setDefaultMemory(model) {
+        const defaultMemories = {
+            '7': 32,
+            '7plus': 32,
+            '7+': 32,
+            '8': 64,
+            '8plus': 64,
+            '8+': 64,
+            'x': 64,
+            'xr': 64,
+            'xsmax': 64,
+            'xs': 64,
+            '11': 64,
+            '11pro': 64,
+            '11promax': 64,
+            '12': 64,
+            '12mini': 64,
+            '12pro': 128,
+            '12promax': 128,
+            '13': 128,
+            '13mini': 128,
+            '13pro': 128,
+            '13promax': 128,
+            'se2ndgen': 64,
+            'se2': 64,
+            'se3rdgen': 64,
+            'se3': 64,
+            '14': 128,
+            '14plus': 128,
+            '14pro': 128,
+            '14promax': 128,
+            '15': 128,
+            '15plus': 128,
+            '15pro': 128,
+            '15promax': 128,
+        };
+
+        return defaultMemories[model] || null;
     }
 }
 

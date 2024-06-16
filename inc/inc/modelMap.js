@@ -1,752 +1,577 @@
 module.exports.modelMap = [
     {
         id: 1,
-        model: 'iPhone 7',
+        model: ['7'],
         price: 18,
-        memory: null,
+        memory: 32,
+        series: 1
     },
     {
         id: 2,
-        model: 'iPhone 7',
-        price: 18,
-        memory: 32,
+        model: ['7'],
+        price: 22,
+        memory: 128,
+        series: 1
     },
     {
         id: 3,
-        model: 'iPhone 7',
-        price: 22,
-        memory: 128,
+        model: ['7'],
+        price: 26,
+        memory: 256,
+        series: 1
     },
     {
         id: 4,
-        model: 'iPhone 7',
+        model: ['7 plus', '7plus', '7+', '7 +'],
         price: 26,
-        memory: 256,
+        memory: 32,
+        series: 1
     },
     {
         id: 5,
-        model: 'iPhone 7 Plus',
-        price: 26,
-        memory: null,
+        model: ['7 plus', '7plus', '7+', '7 +'],
+        price: 32,
+        memory: 128,
+        series: 1
     },
     {
         id: 6,
-        model: 'iPhone 7 Plus',
-        price: 26,
-        memory: 32,
+        model: ['7 plus', '7plus', '7+', '7 +'],
+        price: 38,
+        memory: 256,
+        series: 1
     },
     {
         id: 7,
-        model: 'iPhone 7 Plus',
-        price: 32,
-        memory: 128,
+        model: ['8'],
+        price: 35,
+        memory: 64,
+        series: 2
     },
     {
         id: 8,
-        model: 'iPhone 7 Plus',
-        price: 38,
-        memory: 256,
-    },
-    {
-        id: 5,
-        model: 'iPhone 7+',
-        price: 26,
-        memory: null,
-    },
-    {
-        id: 6,
-        model: 'iPhone 7+',
-        price: 26,
-        memory: 32,
-    },
-    {
-        id: 7,
-        model: 'iPhone 7+',
-        price: 32,
+        model: ['8'],
+        price: 45,
         memory: 128,
-    },
-    {
-        id: 8,
-        model: 'iPhone 7+',
-        price: 38,
-        memory: 256,
+        series: 2
     },
     {
         id: 9,
-        model: 'iPhone 8',
-        price: 35,
-        memory: null,
+        model: ['8'],
+        price: 54,
+        memory: 256,
+        series: 2
     },
     {
         id: 10,
-        model: 'iPhone 8',
-        price: 35,
+        model: ['8 plus', '8plus', '8+', '8 +'],
+        price: 51,
         memory: 64,
+        series: 2
     },
     {
         id: 11,
-        model: 'iPhone 8',
-        price: 45,
+        model: ['8 plus', '8plus', '8+', '8 +'],
+        price: 63,
         memory: 128,
+        series: 2
     },
     {
         id: 12,
-        model: 'iPhone 8',
-        price: 54,
+        model: ['8 plus', '8plus', '8+', '8 +'],
+        price: 73,
         memory: 256,
+        series: 2
     },
     {
         id: 13,
-        model: 'iPhone 8 Plus',
-        price: 51,
-        memory: null,
+        model: ['x'],
+        price: 72,
+        memory: 64,
+        series: 3
     },
     {
         id: 14,
-        model: 'iPhone 8 Plus',
-        price: 51,
-        memory: 64,
+        model: ['x'],
+        price: 90,
+        memory: 256,
+        series: 3
     },
     {
         id: 15,
-        model: 'iPhone 8 Plus',
-        price: 63,
-        memory: 128,
-    },
-    {
-        id: 16,
-        model: 'iPhone 8 Plus',
-        price: 73,
-        memory: 256,
-    },
-    {
-        id: 13,
-        model: 'iPhone 8+',
-        price: 51,
-        memory: null,
-    },
-    {
-        id: 14,
-        model: 'iPhone 8+',
-        price: 51,
+        model: ['xr'],
+        price: 76,
         memory: 64,
-    },
-    {
-        id: 15,
-        model: 'iPhone 8+',
-        price: 63,
-        memory: 128,
+        series: 3
     },
     {
         id: 16,
-        model: 'iPhone 8+',
-        price: 73,
-        memory: 256,
+        model: ['xr'],
+        price: 99,
+        memory: 128,
+        series: 3
     },
     {
         id: 17,
-        model: 'iPhone X',
-        price: 72,
-        memory: null,
+        model: ['xr'],
+        price: 112,
+        memory: 256,
+        series: 3
     },
     {
         id: 18,
-        model: 'iPhone X',
-        price: 72,
+        model: ['xs'],
+        price: 81,
         memory: 64,
+        series: 3
     },
     {
         id: 19,
-        model: 'iPhone X',
-        price: 90,
+        model: ['xs'],
+        price: 103,
         memory: 256,
+        series: 3
     },
     {
         id: 20,
-        model: 'iPhone XR',
-        price: 76,
-        memory: null,
+        model: ['xs'],
+        price: 117,
+        memory: 512,
+        series: 3
     },
     {
         id: 21,
-        model: 'iPhone XR',
-        price: 76,
+        model: ['xs max'],
+        price: 108,
         memory: 64,
+        series: 3
     },
     {
         id: 22,
-        model: 'iPhone XR',
-        price: 99,
-        memory: 128,
+        model: ['xs max'],
+        price: 126,
+        memory: 256,
+        series: 3
     },
     {
         id: 23,
-        model: 'iPhone XR',
-        price: 112,
-        memory: 256,
+        model: ['xs max'],
+        price: 139,
+        memory: 512,
+        series: 3
     },
     {
         id: 24,
-        model: 'iPhone XS',
-        price: 81,
-        memory: null,
+        model: ['11'],
+        price: 112,
+        memory: 64,
+        series: 4
     },
     {
         id: 25,
-        model: 'iPhone XS',
-        price: 81,
-        memory: 64,
+        model: ['11'],
+        price: 130,
+        memory: 128,
+        series: 4
     },
     {
         id: 26,
-        model: 'iPhone XS',
-        price: 103,
+        model: ['11'],
+        price: 148,
         memory: 256,
+        series: 4
     },
     {
         id: 27,
-        model: 'iPhone XS',
-        price: 117,
-        memory: 512,
+        model: ['11 pro'],
+        price: 139,
+        memory: 64,
+        series: 4
     },
     {
         id: 28,
-        model: 'iPhone XS Max',
-        price: 108,
-        memory: null,
+        model: ['11 pro'],
+        price: 166,
+        memory: 256,
+        series: 4
     },
     {
         id: 29,
-        model: 'iPhone XS Max',
-        price: 108,
-        memory: 64,
+        model: ['11 pro'],
+        price: 193,
+        memory: 512,
+        series: 4
     },
     {
         id: 30,
-        model: 'iPhone XS Max',
-        price: 126,
-        memory: 256,
+        model: ['11 pro max'],
+        price: 171,
+        memory: 64,
+        series: 4
     },
     {
         id: 31,
-        model: 'iPhone XS Max',
-        price: 139,
-        memory: 512,
+        model: ['11 pro max'],
+        price: 193,
+        memory: 256,
+        series: 4
     },
     {
         id: 32,
-        model: 'iPhone 11',
-        price: 112,
-        memory: null,
+        model: ['11 pro max'],
+        price: 216,
+        memory: 512,
+        series: 4
     },
     {
         id: 33,
-        model: 'iPhone 11',
-        price: 112,
+        model: ['se 2nd gen', '2020'],
+        price: 49,
         memory: 64,
+        series: 5
     },
     {
         id: 34,
-        model: 'iPhone 11',
-        price: 130,
+        model: ['se 2nd gen', '2020'],
+        price: 63,
         memory: 128,
+        series: 5
     },
     {
         id: 35,
-        model: 'iPhone 11',
-        price: 148,
+        model: ['se 2nd gen', '2020'],
+        price: 81,
         memory: 256,
+        series: 5
     },
     {
         id: 36,
-        model: 'iPhone 11 Pro',
-        price: 139,
-        memory: null,
+        model: ['12'],
+        price: 153,
+        memory: 64,
+        series: 6
     },
     {
         id: 37,
-        model: 'iPhone 11 Pro',
-        price: 139,
-        memory: 64,
+        model: ['12'],
+        price: 175,
+        memory: 128,
+        series: 6
     },
     {
         id: 38,
-        model: 'iPhone 11 Pro',
-        price: 166,
+        model: ['12'],
+        price: 202,
         memory: 256,
+        series: 6
     },
     {
         id: 39,
-        model: 'iPhone 11 Pro',
-        price: 193,
-        memory: 512,
+        model: ['12 mini'],
+        price: 130,
+        memory: 64,
+        series: 6
     },
     {
         id: 40,
-        model: 'iPhone 11 Pro Max',
-        price: 171,
-        memory: null,
+        model: ['12 mini'],
+        price: 153,
+        memory: 128,
+        series: 6
     },
     {
         id: 41,
-        model: 'iPhone 11 Pro Max',
-        price: 171,
-        memory: 64,
+        model: ['12 mini'],
+        price: 175,
+        memory: 256,
+        series: 6
     },
     {
         id: 42,
-        model: 'iPhone 11 Pro Max',
-        price: 193,
-        memory: 256,
+        model: ['12 pro'],
+        price: 198,
+        memory: 128,
+        series: 6
     },
     {
         id: 43,
-        model: 'iPhone 11 Pro Max',
-        price: 216,
-        memory: 512,
+        model: ['12 pro'],
+        price: 220,
+        memory: 256,
+        series: 6
     },
     {
         id: 44,
-        model: 'iPhone SE 2nd Gen',
-        price: 49,
-        memory: null,
+        model: ['12 pro'],
+        price: 247,
+        memory: 512,
+        series: 6
     },
     {
         id: 45,
-        model: 'iPhone SE 2nd Gen',
-        price: 49,
-        memory: 64,
+        model: ['12 pro max'],
+        price: 238,
+        memory: 128,
+        series: 6
     },
     {
         id: 46,
-        model: 'iPhone SE 2nd Gen',
-        price: 63,
-        memory: 128,
+        model: ['12 pro max'],
+        price: 261,
+        memory: 256,
+        series: 6
     },
     {
         id: 47,
-        model: 'iPhone SE 2nd Gen',
-        price: 81,
-        memory: 256,
+        model: ['12 pro max'],
+        price: 288,
+        memory: 512,
+        series: 6
     },
     {
         id: 48,
-        model: 'iPhone 12',
-        price: 153,
-        memory: null,
+        model: ['13'],
+        price: 234,
+        memory: 128,
+        series: 7
     },
     {
         id: 49,
-        model: 'iPhone 12',
-        price: 153,
-        memory: 64,
+        model: ['13'],
+        price: 261,
+        memory: 256,
+        series: 7
     },
     {
         id: 50,
-        model: 'iPhone 12',
-        price: 175,
-        memory: 128,
+        model: ['13'],
+        price: 292,
+        memory: 512,
+        series: 7
     },
     {
         id: 51,
-        model: 'iPhone 12',
-        price: 202,
-        memory: 256,
+        model: ['13 mini'],
+        price: 198,
+        memory: 128,
+        series: 7
     },
     {
         id: 52,
-        model: 'iPhone 12 Mini',
-        price: 130,
-        memory: null,
+        model: ['13 mini'],
+        price: 225,
+        memory: 256,
+        series: 7
     },
     {
         id: 53,
-        model: 'iPhone 12 Mini',
-        price: 130,
-        memory: 64,
+        model: ['13 mini'],
+        price: 256,
+        memory: 512,
+        series: 7
     },
     {
         id: 54,
-        model: 'iPhone 12 Mini',
-        price: 153,
+        model: ['13 pro'],
+        price: 300,
         memory: 128,
+        series: 7
     },
     {
         id: 55,
-        model: 'iPhone 12 Mini',
-        price: 175,
+        model: ['13 pro'],
+        price: 328,
         memory: 256,
+        series: 7
     },
     {
         id: 56,
-        model: 'iPhone 12 Pro',
-        price: 198,
-        memory: null,
+        model: ['13 pro'],
+        price: 360,
+        memory: 512,
+        series: 7
     },
     {
         id: 57,
-        model: 'iPhone 12 Pro',
-        price: 198,
-        memory: 128,
+        model: ['13 pro'],
+        price: 391,
+        memory: 1024,
+        series: 7
     },
     {
         id: 58,
-        model: 'iPhone 12 Pro',
-        price: 220,
-        memory: 256,
+        model: ['13 pro max'],
+        price: 346,
+        memory: 128,
+        series: 7
     },
     {
         id: 59,
-        model: 'iPhone 12 Pro',
-        price: 247,
-        memory: 512,
+        model: ['13 pro max'],
+        price: 373,
+        memory: 256,
+        series: 7
     },
     {
         id: 60,
-        model: 'iPhone 12 Pro Max',
-        price: 238,
-        memory: null,
+        model: ['13 pro max'],
+        price: 405,
+        memory: 512,
+        series: 7
     },
     {
         id: 61,
-        model: 'iPhone 12 Pro Max',
-        price: 238,
-        memory: 128,
+        model: ['13 pro max'],
+        price: 436,
+        memory: 1024,
+        series: 7
     },
     {
         id: 62,
-        model: 'iPhone 12 Pro Max',
-        price: 261,
-        memory: 256,
+        model: ['se3', 'se 3', 'se 3rd gen'],
+        price: 126,
+        memory: 64,
+        series: 8
     },
     {
         id: 63,
-        model: 'iPhone 12 Pro Max',
-        price: 288,
-        memory: 512,
+        model: ['se3', 'se 3', 'se 3rd gen'],
+        price: 157,
+        memory: 128,
+        series: 8
     },
     {
         id: 64,
-        model: 'iPhone 13',
-        price: 234,
-        memory: null,
+        model: ['se3', 'se 3', 'se 3rd gen'],
+        price: 193,
+        memory: 256,
+        series: 8
     },
     {
         id: 65,
-        model: 'iPhone 13',
-        price: 234,
+        model: ['14'],
+        price: 360,
         memory: 128,
+        series: 9
     },
     {
         id: 66,
-        model: 'iPhone 13',
-        price: 261,
+        model: ['14'],
+        price: 396,
         memory: 256,
+        series: 9
     },
     {
         id: 67,
-        model: 'iPhone 13',
-        price: 292,
+        model: ['14'],
+        price: 423,
         memory: 512,
+        series: 9
     },
     {
         id: 68,
-        model: 'iPhone 13 Mini',
-        price: 198,
-        memory: null,
+        model: ['14 plus', '14+'],
+        price: 369,
+        memory: 128,
+        series: 9
     },
     {
         id: 69,
-        model: 'iPhone 13 Mini',
-        price: 198,
-        memory: 128,
+        model: ['14 plus', '14+'],
+        price: 405,
+        memory: 256,
+        series: 9
     },
     {
         id: 70,
-        model: 'iPhone 13 Mini',
-        price: 225,
-        memory: 256,
+        model: ['14 plus', '14+'],
+        price: 432,
+        memory: 512,
+        series: 9
     },
     {
         id: 71,
-        model: 'iPhone 13 Mini',
-        price: 256,
-        memory: 512,
+        model: ['14 pro'],
+        price: 418,
+        memory: 128,
+        series: 9
     },
     {
         id: 72,
-        model: 'iPhone 13 Pro',
-        price: 300,
-        memory: null,
+        model: ['14 pro'],
+        price: 454,
+        memory: 256,
+        series: 9
     },
     {
         id: 73,
-        model: 'iPhone 13 Pro',
-        price: 300,
-        memory: 128,
+        model: ['14 pro'],
+        price: 490,
+        memory: 512,
+        series: 9
     },
     {
         id: 74,
-        model: 'iPhone 13 Pro',
-        price: 328,
-        memory: 256,
+        model: ['14 pro'],
+        price: 526,
+        memory: 1024,
+        series: 9
     },
     {
         id: 75,
-        model: 'iPhone 13 Pro',
-        price: 360,
-        memory: 512,
+        model: ['14 pro max'],
+        price: 472,
+        memory: 128,
+        series: 9
     },
     {
         id: 76,
-        model: 'iPhone 13 Pro',
-        price: 391,
-        memory: 1024,
+        model: ['14 pro max'],
+        price: 504,
+        memory: 256,
+        series: 9
     },
     {
         id: 77,
-        model: 'iPhone 13 Pro Max',
-        price: 346,
-        memory: null,
+        model: ['14 pro max'],
+        price: 540,
+        memory: 512,
+        series: 9
     },
     {
         id: 78,
-        model: 'iPhone 13 Pro Max',
-        price: 346,
-        memory: 128,
+        model: ['14 pro max'],
+        price: 576,
+        memory: 1024,
+        series: 9
     },
     {
         id: 79,
-        model: 'iPhone 13 Pro Max',
-        price: 373,
-        memory: 256,
+        model: ['15'],
+        price: 454,
+        memory: 128,
+        series: 10
     },
     {
         id: 80,
-        model: 'iPhone 13 Pro Max',
-        price: 405,
-        memory: 512,
+        model: ['15'],
+        price: 508,
+        memory: 256,
+        series: 10
     },
     {
         id: 81,
-        model: 'iPhone 13 Pro Max',
-        price: 436,
-        memory: 1024,
-    },
-    {
-        id: 82,
-        model: 'iPhone SE3',
-        price: 126,
-        memory: null,
-    },
-    {
-        id: 83,
-        model: 'iPhone SE3',
-        price: 126,
-        memory: 64,
-    },
-    {
-        id: 84,
-        model: 'iPhone SE3',
-        price: 157,
-        memory: 128,
-    },
-    {
-        id: 85,
-        model: 'iPhone SE3',
-        price: 193,
-        memory: 256,
-    },
-    {
-        id: 82,
-        model: 'iPhone SE 3',
-        price: 126,
-        memory: null,
-    },
-    {
-        id: 83,
-        model: 'iPhone SE 3',
-        price: 126,
-        memory: 64,
-    },
-    {
-        id: 84,
-        model: 'iPhone SE 3',
-        price: 157,
-        memory: 128,
-    },
-    {
-        id: 85,
-        model: 'iPhone SE 3',
-        price: 193,
-        memory: 256,
-    },
-    {
-        id: 82,
-        model: 'iPhone SE 3rd Gen',
-        price: 126,
-        memory: null,
-    },
-    {
-        id: 83,
-        model: 'iPhone SE 3rd Gen',
-        price: 126,
-        memory: 64,
-    },
-    {
-        id: 84,
-        model: 'iPhone SE 3rd Gen',
-        price: 157,
-        memory: 128,
-    },
-    {
-        id: 85,
-        model: 'iPhone SE 3rd Gen',
-        price: 193,
-        memory: 256,
-    },
-    {
-        id: 86,
-        model: 'iPhone 14',
-        price: 360,
-        memory: null,
-    },
-    {
-        id: 87,
-        model: 'iPhone 14',
-        price: 360,
-        memory: 128,
-    },
-    {
-        id: 88,
-        model: 'iPhone 14',
-        price: 396,
-        memory: 256,
-    },
-    {
-        id: 89,
-        model: 'iPhone 14',
-        price: 423,
-        memory: 512,
-    },
-    {
-        id: 90,
-        model: 'iPhone 14 Plus',
-        price: 369,
-        memory: 128,
-    },
-    {
-        id: 91,
-        model: 'iPhone 14 Plus',
-        price: 405,
-        memory: 256,
-    },
-    {
-        id: 92,
-        model: 'iPhone 14 Plus',
-        price: 432,
-        memory: 512,
-    },
-    {
-        id: 90,
-        model: 'iPhone 14+',
-        price: 369,
-        memory: 128,
-    },
-    {
-        id: 91,
-        model: 'iPhone 14+',
-        price: 405,
-        memory: 256,
-    },
-    {
-        id: 92,
-        model: 'iPhone 14+',
-        price: 432,
-        memory: 512,
-    },
-    {
-        id: 93,
-        model: 'iPhone 14 Pro',
-        price: 418,
-        memory: null,
-    },
-    {
-        id: 94,
-        model: 'iPhone 14 Pro',
-        price: 418,
-        memory: 128,
-    },
-    {
-        id: 95,
-        model: 'iPhone 14 Pro',
-        price: 454,
-        memory: 256,
-    },
-    {
-        id: 96,
-        model: 'iPhone 14 Pro',
-        price: 490,
-        memory: 512,
-    },
-    {
-        id: 97,
-        model: 'iPhone 14 Pro',
-        price: 526,
-        memory: 1024,
-    },
-    {
-        id: 98,
-        model: 'iPhone 14 Pro Max',
-        price: 472,
-        memory: null,
-    },
-    {
-        id: 99,
-        model: 'iPhone 14 Pro Max',
-        price: 472,
-        memory: 128,
-    },
-    {
-        id: 100,
-        model: 'iPhone 14 Pro Max',
-        price: 504,
-        memory: 256,
-    },
-    {
-        id: 101,
-        model: 'iPhone 14 Pro Max',
-        price: 540,
-        memory: 512,
-    },
-    {
-        id: 102,
-        model: 'iPhone 14 Pro Max',
-        price: 576,
-        memory: 1024,
-    },
-    {
-        id: 103,
-        model: 'iPhone 15',
-        price: 454,
-        memory: null,
-    },
-    {
-        id: 104,
-        model: 'iPhone 15',
-        price: 454,
-        memory: 128,
-    },
-    {
-        id: 105,
-        model: 'iPhone 15',
-        price: 508,
-        memory: 256,
-    },
-    {
-        id: 106,
-        model: 'iPhone 15',
+        model: ['15'],
         price: 571,
         memory: 512,
+        series: 10
     },
 ];
+
+module.exports.modelLookup = {};
+const { modelMap } = module.exports;
+modelMap.forEach((entry) => {
+    entry.model.forEach((name) => {
+        module.exports.modelLookup[name.toLowerCase()] = entry;
+    });
+});

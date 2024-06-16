@@ -32,11 +32,13 @@ class Database {
                     $setOnInsert: {
                         model: listing.model,
                         modelId: listing.modelId,
+                        series: listing.series,
                         price: listing.price,
                         memory: listing.memory,
                         url: listing.url,
                         site: listing.site,
                         status: listing.status,
+                        createdAt: listing.createdAt
                     }
                 },
                 { upsert: true }
@@ -62,16 +64,31 @@ class Database {
         }
     }
 
-    async fetchListings(site) {
+    async fetchListings(site, modelId, sortPrice) {
         try {
-            const query = site ? { site } : {};
-            const listings = await Listing.find(query).lean();
+            const query = {};
+    
+            if (site) {
+                query.site = site;
+            }
+    
+            if (modelId) {
+                query.modelId = modelId;
+            }
+    
+            let sort = { scrapedAt: -1 };
+            if (sortPrice) {
+                sort = { price: sortPrice === 'asc' ? 1 : -1 };
+            }
+    
+            const listings = await Listing.find(query).sort(sort).lean();
             return listings;
         } catch (error) {
             console.error('Error fetching listings:', error);
             return [];
         }
     }
+
 
     async fetchListingsByModelId(modelId) {
         try {
