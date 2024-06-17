@@ -21,7 +21,7 @@ async function startScrape() {
     }
 }
 
-app.get('/retrieve-listings', async(req, res) => {
+app.get('/retrieve-listings', async (req, res) => {
     try {
         res.status(200).send('Scraping started');
         await startScrape();
