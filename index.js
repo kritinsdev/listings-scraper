@@ -18,7 +18,12 @@ app.use(express.json());
 async function startScrape() {
     for (let i = 0; i < sites.length; i++) {
         const s = new Scraper(sitesConfig[sites[i]], db);
-        await s.scrape();
+
+        try {
+            await s.scrape();
+        } catch (error) {
+            console.error('Error during loop:', error);
+        }
     }
 }
 
