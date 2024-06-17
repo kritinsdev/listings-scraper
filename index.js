@@ -1,4 +1,5 @@
 const express = require('express');
+const cron = require('node-cron');
 const Database = require('./inc/models/Database');
 const Scraper = require('./inc/Scraper');
 const { sitesConfig, sites } = require('./siteConfig');
@@ -14,26 +15,22 @@ app.use(express.json());
     await db.connect();
 })();
 
-app.get('/', (req, res) => {
-    res.send('[INDEX]');
-});
-
-app.get('/scrape23hashed', async (req, res) => {
-    try {
-        res.status(200).send('Scraping started');
-        await startScrape();
-    } catch (error) {
-        console.error('Error during scraping:', error);
-        res.status(500).send('An error occurred while scraping.');
-    }
-});
-
 async function startScrape() {
     for (let i = 0; i < sites.length; i++) {
         const s = new Scraper(sitesConfig[sites[i]], db);
         await s.scrape();
     }
 }
+
+cron.schedule('* * * * *', async () => {
+    console.log('Running the scraping job');
+    try {
+        await startScrape();
+    } catch (error) {
+        console.error('Error during scheduled scraping:', error);
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);

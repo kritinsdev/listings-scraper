@@ -8,7 +8,7 @@ class Scraper {
         this.siteConfig = config;
         this.currentSite = this.siteConfig.sitename;
         this.pageUrl = this.siteConfig.url;
-        this.scrapeOnlyFirstPage = this.siteConfig['scrapeOnlyFirst'];
+        this.onlyFirst = this.siteConfig['onlyFirst'];
         this.scrapedListingUrls = [];
         this.existingListingUrls = [];
     }
@@ -61,13 +61,13 @@ class Scraper {
         switch (this.currentSite) {
             case 'andelemandele':
                 await page.waitForSelector(this.siteConfig.selectors['paginator'], { visible: true });
-                return (!this.scrapeOnlyFirstPage) ? await page.$eval(this.siteConfig.selectors['paginator'], el => el.getAttribute('data-total')) : 1;
+                return (!this.onlyFirst) ? await page.$eval(this.siteConfig.selectors['paginator'], el => el.getAttribute('data-total')) : 1;
             case 'ss':
                 await page.waitForSelector(this.siteConfig.selectors['paginator'], { visible: true });
                 const lastPageLink = await page.$eval('div.td2 > a:nth-child(1)', el => el.getAttribute('href'));
                 const regex = /(\d+)\.html$/;
                 const match = lastPageLink.match(regex);
-                if (!this.scrapeOnlyFirstPage) {
+                if (!this.onlyFirst) {
                     return parseInt(match[1]);
                 }
                 return 1;
