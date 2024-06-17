@@ -27,7 +27,7 @@ async function startScrape() {
     }
 }
 
-cron.schedule('* * * * *', async () => {
+cron.schedule('*/2 * * * *', async () => {
     console.log('Running the scraping job');
     try {
         await startScrape();
