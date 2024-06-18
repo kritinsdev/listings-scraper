@@ -21,6 +21,10 @@ async function startScrape() {
     }
 }
 
+app.get('/', (req, res) => {
+    res.send('[INDEX]');
+});
+
 app.get('/retrievelistings1', async (req, res) => {
     try {
         res.status(200).send('Scraping started');
