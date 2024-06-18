@@ -21,7 +21,7 @@ async function startScrape() {
     }
 }
 
-app.get('/retrieve-listings', async (req, res) => {
+app.get('/retrievelistings1', async (req, res) => {
     try {
         res.status(200).send('Scraping started');
         await startScrape();
@@ -29,7 +29,7 @@ app.get('/retrieve-listings', async (req, res) => {
         console.error('Error during scraping:', error);
         res.status(500).send('An error occurred while scraping.');
     }
-})
+});
 
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
