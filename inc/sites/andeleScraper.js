@@ -73,7 +73,6 @@ async function andeleScraper(url, browser, db) {
             const hour = parseInt(timeParts[0], 10);
             const minute = parseInt(timeParts[1], 10);
         
-            // Check for valid month index
             if (isNaN(month) || month < 0 || month > 11) {
                 throw new Error(`Invalid month: ${dateParts[1]}`);
             }
@@ -167,7 +166,7 @@ async function andeleScraper(url, browser, db) {
                 status: 'listing_scraped',
             });
 
-            if((Math.abs(listing.price - modelData.price) <= 125)) {
+            if((Math.abs(listing.price - modelData.price) <= 30)) {
                 data = {
                     description: listing.description,
                     model: modelData.model[0],

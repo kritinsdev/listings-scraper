@@ -123,7 +123,7 @@ async function ssScraper(url, browser, db) {
                 status: 'listing_scraped',
             });
 
-            if((Math.abs(listing.price - modelData.price) <= 125)) {
+            if((Math.abs(listing.price - modelData.price) <= 30)) {
                 data = {
                     description: listing.description,
                     model: modelData.model[0],
